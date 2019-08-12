@@ -1,2 +1,2 @@
-# pronichkin.github.io
-pronichkin.com
+# pronichkin.com
+placeholder
