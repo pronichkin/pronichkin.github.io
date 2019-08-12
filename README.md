@@ -1,2 +1,0 @@
-# pronichkin.com
-placeholder
