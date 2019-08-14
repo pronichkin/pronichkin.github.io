@@ -9,19 +9,20 @@
 </head>
 <body>
     <h1>Tools manifesto</h1>
+    <p>version 2019-08-14 by <a href="/">Artem Pronichkin</a></p>
     <h2>TL;DR</h2>
     <p>
         The below requirements are based on my experience working with several
         security-cautions customers, such as banks or government agencies across
         the world.
     </p>
-    <h2>Introduction</h2>
+    <h2>The problem with current support tools</h2>
     <p>
         When supporting customers or working with commercial support organizations
         on behalf of customers, it's quite common to be asked for running a
         certain tool to troubleshoot or gather logs. It sounds very easy for
-        support people, and hence they tend to &ldquo;overrequest&rdquo;&mdash;
-        that is, ask for using more tools than needed at this point.
+        support people, and hence they tend to &ldquo;overrequest
+        &rdquo;&mdash;that is, ask for using more tools than needed at certain point.
     </p>
     <p>
         Unfortunately, not all tools are created equal, and some of them might be
@@ -41,23 +42,38 @@
         to comply with all of these requirements, you can be confident your tool
         won't face any obstacles and can be recommended for broad use.
     </p>
+    <h2>Scope of the problem</h2>
     <p>
-        Last but not least, these requirements are not specific to troubleshooting
+        These requirements are not specific to troubleshooting
         or diagnostic tools. I mention those types of tools first because I have
-        personally been bitten by this before many times. When you have a problem
-        and call for support, the last thing you want is to be asked to run a
-        tool that you cannot easily run. However, the below requirements are
+        personally been bitten by this before many times. When you have a
+        time-sensitive problem and call for support, the last thing you want is
+        to be asked for running a tool which fails to execute. So that instead
+        of troubleshooting the actual problem, you start troubleshooting the
+        tool. And this might require changes to production servers which are
+        often not easy (either technically or operationally), or might impact
+        the repro.
+    </p>
+    <p>        
+        However, the below requirements are
         in fact universal and can (or even should) be applied to any tools or
         utilities that
-        we expect customers to run&mdash;such as monitoring, hardware configuration,
+        we, as an industry, expect customers to run&mdash;such as monitoring,
+        hardware configuration,
         audit assessment, system deployment and configuration, etc.
     </p>
+    <hr />
     <h2>1. Compliance with Application Whitelisting solutions</h2>
     <p>
-        Ideally, the tool should come inbox with operating system. Even if
-        you plan to update it later, having it inbox at first time would help
+        Ideally, the tool should come inbox with operating system (or other
+        product that it's intended to work with&mdash;e.g. database software.)
+        Even if
+        you plan to update it frequently, having the initial version inbox at
+        first place (merely as a placeholder) would help
         including it into whitelisting policy. In fact, anything coming
-        inbox will likely be whitelisted by default.
+        inbox will likely be whitelisted by default. And due to the way many
+        whitelisting solutions work, that would automatically cover future 
+        versions.
     </p>
     <p>
         If you cannot ship your tool inbox, that's of course understood and
@@ -69,15 +85,21 @@
                     All the files that comprise the tool itself should be
                     digitally signed. (Preferably with Microsoft or other
                     recognizable vendor certificate.)<br/>
-                    Please note that even PowerShell scripts can (and should)
+                    Please note that even WSH or PowerShell scripts can (and should)
                     be signed. Technically, a signature looks like a block
                     of text at the end of the script. Hence, the script
                     can still be distributed as a text file or embedded into
                     other, more complex structures&mdash;without invalidating
-                    the signature.
+                    the signature.<br />
+                    For this reason, the tool should not generate
+                    or modify scripts on the fly. If you need to provide
+                    variables dynamically, you can supply them as script
+                    parameters. (That would also not invalidate the signature
+                    of the script itself.)
                 </li>
                 <li>
-                    If the tool comes in the form of binary executable (.exe)
+                    If the tool comes in the form of binary executable (.exe,
+                    .dll, etc.)
                     the PE header should be populated with meaningful values
                     (e.g. tool name in &ldquo;File Name&rdquo; field.) These
                     values should not be overly generic.
@@ -85,7 +107,7 @@
                 <li>
                     There should be a clear way to differentiate between
                     tool versions. Preferably, the version should be specified
-                    in respective fields of PE header, or script header.
+                    in respective fields of PE header, or custom script heading.
                 </li>
                 <li>
                     The version should <b>not</b> be included into &ldquo;File
@@ -117,7 +139,7 @@
         If you are not familiar with WDAC, you can learn about it
         <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/windows-defender-application-control">
         here</a>. However, you don't have to become a WDAC expert. If you
-        comply with the requirements listed below, you can rest assured
+        comply with the requirements listed above, you can rest assured
         that your tool does its best to comply with WDAC.<br />
     </p>        
     <blockquote>
@@ -132,8 +154,8 @@
             <a href="https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/">
             Constrained Language Mode</a>. If your script is fully functional 
             under constrained
-            language mode, the above requirements are &ldquo;nice to have&rdquo;
-            &mdash;but not strictly necessary.<br/>
+            language mode, the above requirements are &ldquo;nice to
+            have&rdquo;&mdash;but not strictly necessary.<br/>
     </p>
     <p>
         If you are not sure whether your script supports Constrained
@@ -169,7 +191,7 @@
         means they have no password whatsoever. (Well, technically, they still
         do have a password&mdash;however, they do not know it.) Another somewhat
         similar scenario is Remote Credential Guard, where the user is not
-        <b>supposed</b> to enter any credentials interactively, even thought they
+        <b>supposed</b> to enter any credentials interactively, even though they
         technically can.
     </p>
     <p>
@@ -187,28 +209,28 @@
         components from the Internet, or upload diagnostic data directly to
         the vendor. This behavior can be optional, and of course many customers
         would appreciate that. However, there should be also an option to supply
-        all the required components (e.g. baseline metadata, updates, etc.)
-        offline, and to produce results as a set of files which can be transferred
-        to the vendor manually, if needed.
+        all the required components (e.g. baselines, metadata, schemas, updates,
+        etc.) offline, and to emit results as a set of files which can be
+        transferred to the vendor manually, if needed.
     </p>
 
     <h2>5. External dependencies</h2>
     <p>
         Generally, the number of dependencies should be as small as possible.
-        On approach to achieve that is making the tool modular. E.g. it's
+        One approach to achieve that is making the tool modular. E.g. it's
         certainly helpful
         if you support gathering data using several external tools (e.g.
         Sysinternals.) But it helps if these operations are optional and can
         be omitted. Of course, running in reduced functionality will gather
-        fewer data&mdash;but it might be enough for some cases, or at least
-        at the beginning. So, please do not assume you can only &ldquo;do all 
+        fewer data&mdash;but it might be still enough for some cases, or at least
+        at the beginning. So, please do not assume you can only do &ldquo;all
         or nothing&rdquo;.
     </p>
     <p>
         The reason for this requirement is also application whitelisting. If your
         tool is a simple script, it might not need being included into the
-        whitelisting policy, and hence would not require policy changes. However,
-        if any dependency is a binary, it will certainly require a policy
+        whitelisting policy at all. And hence it would not require policy changes.
+        However, if any dependency is a binary, it will certainly require a policy
         modification. Any such occasion impose additional operational overhead
         and might slowdown or complicate troubleshooting efforts (which may be
         time-sensitive.)
