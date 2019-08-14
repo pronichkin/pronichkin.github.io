@@ -52,19 +52,19 @@
         we expect customers to run&mdash;such as monitoring, hardware configuration,
         audit assessment, system deployment and configuration, etc.
     </p>
-    <h2>Requirements or best practices</h2>
-    <ol>
-        <li>
-            Ideally, the tool should come inbox with operating system. Even if
-            you plan to update it later, having it inbox at firs time would help
-            including it into whitelisting policy. In fact, anything coming
-            inbox will likely be whitelisted by default.<br/>
-
-            If you cannot ship your tool inbox, that's of course understood and
-            is totally fine. However, in this case you need at least to comply
-            with the following publishing requirements.
-
-            <ol type="a">
+    <h2>1. Code integrity (CI) compliance</h2>
+    <p>
+        Ideally, the tool should come inbox with operating system. Even if
+        you plan to update it later, having it inbox at first time would help
+        including it into whitelisting policy. In fact, anything coming
+        inbox will likely be whitelisted by default.
+    </p>
+    <p>
+        If you cannot ship your tool inbox, that's of course understood and
+        is totally fine. However, in this case you need at least to comply
+        with the following publishing requirements.
+    </p>
+    <ol type="a">
                 <li>
                     All the files that comprise the tool itself should be
                     digitally signed. (Preferably with Microsoft or other
@@ -105,25 +105,27 @@
                     If it comes in an archive, you should use cab format or other
                     that supports embedded digital signature.
                 </li>
-            </ol>
-
-            All of the above requirements are imposed by whitelisting solutions
-            &mdash;such as Windows Defender Application Control (WDAC), also
-            known as &ldquo;Device Guard User Mode Code Integirty&rdquo; (UMCI).
-            <br/>
-            If you are not familiar with WDAC, you can learn about it 
-            <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/windows-defender-application-control">
-            here</a>. However, you don't have to become a WDAC expert. If you
-            comply with the requirements listed below, you can rest assured
-            that your tool does its best to comply with WDAC.<br/>
-            
-            <blockquote>
+    </ol>
+    <p>
+                All of the above requirements are imposed by whitelisting solutions
+                &mdash;such as Windows Defender Application Control (WDAC), also
+                known as &ldquo;Device Guard User Mode Code Integirty&rdquo; (UMCI).
+    </p>
+    <p>
+        If you are not familiar with WDAC, you can learn about it
+        <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/windows-defender-application-control">
+            here
+        </a>. However, you don't have to become a WDAC expert. If you
+        comply with the requirements listed below, you can rest assured
+        that your tool does its best to comply with WDAC.<br />
+    </p>        
+    <blockquote>
                 If you happen to ship a kernel mode driver (which is very uncommon
                 for troubleshooting tools) please make sure you comply with 
                 <a href="https://techcommunity.microsoft.com/t5/Windows-Hardware-Certification/Driver-compatibility-with-Device-Guard-in-Windows-10/ba-p/364865">
                 HVCI requirements</a> as well.
-            </blockquote>
-
+    </blockquote>
+    <p>
             The above requirements can be skipped only if the tool is a very
             simple PowerShell script which can be executed in 
             <a href="https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/">
@@ -131,10 +133,10 @@
             under constrained
             language mode, the above requirements are &ldquo;nice to have&rdquo;
             &mdash;but not strictly necessary.<br/>
-
-            If you are not sure whether your script can supports Constrained 
-            Language Mode please do not assume it does.
-        </li>
-    </ol>
+    </p>
+    <p>
+        If you are not sure whether your script can supports Constrained
+        Language Mode please do not assume it does.
+    </p>
 </body>
 </html>
