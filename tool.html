@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        * {
+            font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tools manifesto</h1>
+    <h2>TL;DR</h2>
+    <p>
+        The below requirements are based on my experience working with several
+        security-cautions customers, such as banks or government agencies across
+        the world.
+    </p>
+    <h2>Introduction</h2>
+    <p>
+        When supporting customers or working with commercial support organizations
+        on behalf of customers, it's quite common to be asked for running a
+        certain tool to troubleshoot or gather logs. It sounds very easy for
+        support people, and hence they tend to &ldquo;overrequest"&rdquo;&mdash;
+        that is, ask for using more tools than needed at this point.
+    </p>
+    <p>
+        Unfortunately, not all tools are create equal, and some of them might be
+        difficult to run in certain environment&mdash;especially when it's fairly
+        locked down. While certainly possible, request
+        to run such tools might delay troubleshooting significantly, because it
+        would require to change production system configuration (e.g. include
+        specific binary into whitelisting policy.) Hence, we should avoid such
+        tools (that is, the tools which fail to comply with the requirements
+        provided below)&mdash;unless absolutely necessary and reasonable to proceed.
+    </p>
+    <p>
+        I'm not saying that each and every customer would impose the constraints
+        listed below. In fact, most of the customers would not, or maybe they
+        will have only one or two of these requirements. However, the list below
+        is meant to be comprehensive and failsafe&mdash;that is, if you succeed
+        to comply with all of these requirements, you can be confident your tool
+        won't face any obstacles and can be recommended for broad use.
+    </p>
+    <p>
+        Last but not least, these requirements are not specific to troubleshooting
+        or diagnostic tools. I mention those types of tools first because I have
+        personally been bitten by this before many times. When you have a problem
+        and call for support, the last thing you want is to be asked to run a
+        tool that you cannot easily run. However, the below requirements are
+        in fact universal and can (or even should) be applied to any tools or
+        utilities that
+        we expect customers to run&mdash;such as monitoring, hardware configuration,
+        audit assessment, system deployment and configuration, etc.
+    </p>
+</body>
+</html>
