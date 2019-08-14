@@ -20,11 +20,11 @@
         When supporting customers or working with commercial support organizations
         on behalf of customers, it's quite common to be asked for running a
         certain tool to troubleshoot or gather logs. It sounds very easy for
-        support people, and hence they tend to &ldquo;overrequest"&rdquo;&mdash;
+        support people, and hence they tend to &ldquo;overrequest&rdquo;&mdash;
         that is, ask for using more tools than needed at this point.
     </p>
     <p>
-        Unfortunately, not all tools are create equal, and some of them might be
+        Unfortunately, not all tools are created equal, and some of them might be
         difficult to run in certain environment&mdash;especially when it's fairly
         locked down. While certainly possible, request
         to run such tools might delay troubleshooting significantly, because it
@@ -52,5 +52,89 @@
         we expect customers to run&mdash;such as monitoring, hardware configuration,
         audit assessment, system deployment and configuration, etc.
     </p>
+    <h2>Requirements or best practices</h2>
+    <ol>
+        <li>
+            Ideally, the tool should come inbox with operating system. Even if
+            you plan to update it later, having it inbox at firs time would help
+            including it into whitelisting policy. In fact, anything coming
+            inbox will likely be whitelisted by default.<br/>
+
+            If you cannot ship your tool inbox, that's of course understood and
+            is totally fine. However, in this case you need at least to comply
+            with the following publishing requirements.
+
+            <ol type="a">
+                <li>
+                    All the files that comprise the tool itself should be
+                    digitally signed. (Preferably with Microsoft or other
+                    recognizable vendor certificate.)<br/>
+                    Please note that even PowerShell scripts can (and should)
+                    be signed. Technically, a signature looks like a block
+                    of text at the end of the script. Hence, the script
+                    can still be distributed as a text file or embedded into
+                    other, more complex structures&mdash;without invalidating
+                    the signature.
+                </li>
+                <li>
+                    If the tool comes in the form of binary executable (.exe)
+                    the PE header should be populated with meaningful values
+                    (e.g. tool name in &ldquo;File Name&rdquo; field.) These
+                    values should not be overly generic.
+                </li>
+                <li>
+                    There should be a clear way to differentiate between
+                    tool versions. Preferably, the version should be specified
+                    in respective fields of PE header, or script header.
+                </li>
+                <li>
+                    The version should <b>not</b> be included into &ldquo;File 
+                    Name&rdquo; field (e.g. &ldquo;MyTool v.1.2.3.4&rdquo;).
+                    Instead, the version should be specified in the designated
+                    fields (e.g. &ldquo;File Version&rdquo;). This is because
+                    every time &ldquo;File Name&rdquo; is changed, it is
+                    typically distinguished as a <b>new</b> binary by whitelisting
+                    mechanisms, and hence such file should be included separately&mdash;
+                    which requires rebuilding and reapplying the policy, which 
+                    often means a reboot.
+                </li>
+                <li>
+                    The above requirement also applies to whatever packaging
+                    mechanism is used for delivery. I.e. if the tool comes with
+                    a self-extracting installer, that installer should be signed.
+                    If it comes in an archive, you should use cab format or other
+                    that supports embedded digital signature.
+                </li>
+            </ol>
+
+            All of the above requirements are imposed by whitelisting solutions
+            &mdash;such as Windows Defender Application Control (WDAC), also
+            known as &ldquo;Device Guard User Mode Code Integirty&rdquo; (UMCI).
+            <br/>
+            If you are not familiar with WDAC, you can learn about it 
+            <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/windows-defender-application-control">
+            here</a>. However, you don't have to become a WDAC expert. If you
+            comply with the requirements listed below, you can rest assured
+            that your tool does its best to comply with WDAC.<br/>
+            
+            <blockquote>
+                If you happen to ship a kernel mode driver (which is very uncommon
+                for troubleshooting tools) please make sure you comply with 
+                <a href="https://techcommunity.microsoft.com/t5/Windows-Hardware-Certification/Driver-compatibility-with-Device-Guard-in-Windows-10/ba-p/364865">
+                HVCI requirements</a> as well.
+            </blockquote>
+
+            The above requirements can be skipped only if the tool is a very
+            simple PowerShell script which can be executed in 
+            <a href="https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/">
+            Constrained Language Mode</a>. If your script is fully functional 
+            under constrained
+            language mode, the above requirements are &ldquo;nice to have&rdquo;
+            &mdash;but not strictly necessary.<br/>
+
+            If you are not sure whether your script can supports Constrained 
+            Language Mode please do not assume it does.
+        </li>
+    </ol>
 </body>
 </html>
