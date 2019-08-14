@@ -52,7 +52,7 @@
         we expect customers to run&mdash;such as monitoring, hardware configuration,
         audit assessment, system deployment and configuration, etc.
     </p>
-    <h2>1. Code integrity (CI) compliance</h2>
+    <h2>1. Compliance with Application Whitelisting solutions</h2>
     <p>
         Ideally, the tool should come inbox with operating system. Even if
         you plan to update it later, having it inbox at first time would help
@@ -88,34 +88,35 @@
                     in respective fields of PE header, or script header.
                 </li>
                 <li>
-                    The version should <b>not</b> be included into &ldquo;File 
+                    The version should <b>not</b> be included into &ldquo;File
                     Name&rdquo; field (e.g. &ldquo;MyTool v.1.2.3.4&rdquo;).
                     Instead, the version should be specified in the designated
                     fields (e.g. &ldquo;File Version&rdquo;). This is because
-                    every time &ldquo;File Name&rdquo; is changed, it is
-                    typically distinguished as a <b>new</b> binary by whitelisting
-                    mechanisms, and hence such file should be included separately&mdash;
-                    which requires rebuilding and reapplying the policy, which 
-                    often means a reboot.
+                    every time value of &ldquo;File Name&rdquo; field is changed,
+                    it is typically distinguished by whitelisting
+                    mechanisms as a <b>new</b> binary. Hence such file needs to
+                    be added to the policy
+                    separately&mdash;which requires rebuilding and reapplying
+                    the policy. And this often means a reboot.
                 </li>
                 <li>
-                    The above requirement also applies to whatever packaging
+                    The above requirements also apply to whatever packaging
                     mechanism is used for delivery. I.e. if the tool comes with
                     a self-extracting installer, that installer should be signed.
                     If it comes in an archive, you should use cab format or other
-                    that supports embedded digital signature.
+                    that supports embedded digital signature. (Zip format is known
+                    to <b>not</b> support signatures, so it should be avoided.)
                 </li>
     </ol>
     <p>
                 All of the above requirements are imposed by whitelisting solutions
-                &mdash;such as Windows Defender Application Control (WDAC), also
+                such as Windows Defender Application Control (WDAC), also
                 known as &ldquo;Device Guard User Mode Code Integirty&rdquo; (UMCI).
     </p>
     <p>
         If you are not familiar with WDAC, you can learn about it
         <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/windows-defender-application-control">
-            here
-        </a>. However, you don't have to become a WDAC expert. If you
+        here</a>. However, you don't have to become a WDAC expert. If you
         comply with the requirements listed below, you can rest assured
         that your tool does its best to comply with WDAC.<br />
     </p>        
@@ -135,8 +136,131 @@
             &mdash;but not strictly necessary.<br/>
     </p>
     <p>
-        If you are not sure whether your script can supports Constrained
-        Language Mode please do not assume it does.
+        If you are not sure whether your script supports Constrained
+        Language Mode, please do not assume it does.
+    </p>
+
+    <h2>2. Server Core support</h2>
+    <p>
+        The tool has to support Server Core installation option. This typically 
+        means no GUI assumptions or dependencies.
+    </p>
+    <blockquote>
+        Todo: include a link to Server Core SDK or otherwise, a list of 
+        unavailable components
+    </blockquote>
+    <p>
+        The above does not mean your tool has to be command line <b>only.</b>
+        It can have a GUI as long as it's not the <b>only</b> mode of operation.
+        However, all functionality should be also available in command line.
+    </p>
+
+    <h2>3. Current user credentials</h2>
+    <p>
+        It is very beneficial if the tool supports connecting to remote systems.
+        In fact, that's one of the requirements listed below. However, you should
+        not assume that fresh credentials are <b>always required</b> for that
+        (or for any other operations.)
+    </p>
+    <p>
+        There may be scenarios where current user cannot supply credentials on
+        demand, especially if you prompt for user name and password and do not
+        support smartcards. Some users are &ldquo;smart card only&rdquo; which
+        means they have no password whatsoever. (Well, technically, they still
+        do have a password&mdash;however, they do not know it.) Another somewhat
+        similar scenario is Remote Credential Guard, where the user is not
+        <b>supposed</b> to enter any credentials interactively, even thought they
+        technically can.
+    </p>
+    <p>
+        For these reasons, the tool should always try using current user credentials
+        first. (That is typically Kerberos ticket obtained from current logon
+        session&mdash;however, normally you do not need to code anything special
+        for this.) Only prompt for credentials optionally, or if everything else
+        fails.
+    </p>
+
+    <h2>4. Internet connectivity</h2>
+    <p>
+        Some customers operate fully air-gapped (that is, isolated) networks.
+        For this reason, the tool should not assume it always can download
+        components from the Internet, or upload diagnostic data directly to
+        the vendor. This behavior can be optional, and of course many customers
+        would appreciate that. However, there should be also an option to supply
+        all the required components (e.g. baseline metadata, updates, etc.)
+        offline, and to produce results as a set of files which can be transferred
+        to the vendor manually, if needed.
+    </p>
+
+    <h2>5. External dependencies</h2>
+    <p>
+        Generally, the number of dependencies should be as small as possible.
+        On approach to achieve that is making the tool modular. E.g. it's
+        certainly helpful
+        if you support gathering data using several external tools (e.g.
+        Sysinternals.) But it helps if these operations are optional and can
+        be omitted. Of course, running in reduced functionality will gather
+        fewer data&mdash;but it might be enough for some cases, or at least
+        at the beginning. So, please do not assume you can only &ldquo;do all 
+        or nothing&rdquo;.
+    </p>
+    <p>
+        The reason for this requirement is also application whitelisting. If your
+        tool is a simple script, it might not need being included into the
+        whitelisting policy, and hence would not require policy changes. However,
+        if any dependency is a binary, it will certainly require a policy
+        modification. Any such occasion impose additional operational overhead
+        and might slowdown or complicate troubleshooting efforts (which may be
+        time-sensitive.)
+    </p>
+    <p>
+        Even if your tool needs to be whitelisted by itself, adding fewer external
+        items to the policy is often faster and easier to justify than adding a large
+        number of dependencies with opaque scope.
+    </p>
+
+    <h2>6. Inbox dependencies</h2>
+    <p>
+        Any dependency should not be assumed as granted. It needs to be explicitly
+        documented (in tool's readme, accompanying email template, etc.) This 
+        even applies to dependencies on any inbox components, such as PowerShell
+        modules or 32-bit subsystem (WoW64.) Even though these components are 
+        included <i>by default,</i> if they can be uninstalled&mdash;there will
+        be customers who remove them for one reason or another.
+    </p>
+
+    <h2>7. Remote operations</h2>
+    <p>
+        The tool needs to support at least one of the following. (Bonus points
+        if you manage to satisfy both requirements.)
+        <ol type="a">
+            <li>
+                Remote execution. That is, running on machine <i>A</i> while
+                analyzing or configuring machines <i>B</i> and <i>C</i>.
+            </li>
+            <li>
+                Support running in PowerShell remoting sessions. That typically
+                means no interactive prompts such as &ldquo;y/n&rdquo; and no
+                pop-up modal boxes (including errors or warnings.)<br/>
+                This also includes uncommon cases such
+                as not assuming to be able to talk to winlogon process or
+                other session infrastructure or user profile artifacts. For 
+                instance, it is known that if a user has never logged on
+                interactively (e.g. via Remote Desktop services), the profile
+                is not fully created&mdash;even though their <i>user folders</i>
+                are accessible and usable upon logging on via PowerShell remoting.
+                <blockquote>
+                    Todo: add more technical details on what's available and
+                    what's not.
+                </blockquote>
+                Such dependencies should be generally avoided&mdash;unless clearly
+                necessary and unavoidable. (In which case requirements should be
+                documented).<br />
+                That said, most of existing command-line tools are known to
+                operate in PowerShell remoting sessions just fine without any
+                noticeable limitations.
+            </li>
+        </ol>
     </p>
 </body>
 </html>
