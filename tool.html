@@ -9,7 +9,15 @@
 </head>
 <body>
     <h1>Tools manifesto</h1>
-    <p><a href="https://github.com/pronichkin/pronichkin.github.io/blob/master/tool.html">comment or submit an edit</a> &bull version 2019-08-14 by <a href="/">Artem Pronichkin</a></p>
+    <p>
+        version 2019-08-14 by <a href="/">Artem Pronichkin</a> &bull; submit a
+        <a href="https://github.com/pronichkin/pronichkin.github.io/issues">
+            comment (&ldquo;issue&rdquo;)
+        </a> or
+        <a href="https://github.com/pronichkin/pronichkin.github.io/blob/master/tool.html">
+            edit
+        </a>
+    </p>
     <h2>TL;DR</h2>
     <p>
         If you develop, maintain, own a tool or utility, or repeatedly ask others
@@ -22,10 +30,50 @@
         the world.
     </p>
     <p>
-        In a very short way, all of the below can be reduced to: do not require or
-        assume more than needed, and document everything which is truly required.
+        In a very short way, all of the below can be reduced to: <i>
+            do not
+            require or assume more than needed, and document everything which is
+            truly required.
+        </i>
     </p>
-    <h2>The problem with today's tools</h2>
+    <h2 id="Contents">Contents</h2>
+    <ul>
+        <li>
+            <a href="#problem">The problem with today's tools</a>
+        </li>
+        <li>
+            <a href="#scope">Scope of the problem</a>
+        </li>
+        <li>
+            <a href="#1. Whitelisting">1.&nbsp;Compliance with Application Whitelisting solutions</a>
+        </li>
+        <li>
+            <a href="#2. Core">2.&nbsp;Server Core support</a>
+        </li>
+        <li>
+            <a href="#3. Credentials">3.&nbsp;Current user credentials</a>
+        </li>
+        <li>
+            <a href="#4. Internet">4.&nbsp;Internet connectivity</a>
+        </li>
+        <li>
+            <a href="#5. Dependencies external">5.&nbsp;External dependencies</a>
+        </li>
+        <li>
+            <a href="#6. Dependencies inbox">6.&nbsp;Inbox dependencies</a>
+        </li>
+        <li>
+            <a href="#7. Remote">7.&nbsp;Remote operations</a>
+        </li>
+        <li>
+            <a href="#8. Permissions">8.&nbsp;Permissions and privileges (local Administrator)</a>
+        </li>
+        <li>
+            <a href="#9. Distribution">9.&nbsp;Distribution mechanisms</a>
+        </li>
+    </ul>
+
+    <h2 id="problem">The problem with today's tools</h2>
     <p>
         When supporting customers or working with commercial support organizations
         on behalf of customers, it's quite common to be asked for running a
@@ -51,7 +99,7 @@
         to comply with all of these requirements, you can be confident your tool
         won't face any obstacles and can be recommended for broad use.
     </p>
-    <h2>Scope of the problem</h2>
+    <h2 id="scope">Scope of the problem</h2>
     <p>
         These requirements are not specific to troubleshooting
         or diagnostic tools. I mention those types of tools first because I have
@@ -59,9 +107,9 @@
         time-sensitive problem and call for support, the last thing you want is
         to be asked for running a tool which fails to execute. So that instead
         of troubleshooting the actual problem, you start troubleshooting the
-        tool. And this might require changes to production servers which are
-        often not easy (either technically or operationally), or might impact
-        the repro.
+        tool. And at the end that might require changes to production environment
+        which are often not easy (either technically or operationally), or might
+        impact the repro.
     </p>
     <p>
         However, the below requirements are
@@ -72,20 +120,34 @@
         audit assessment, system deployment and configuration, etc.
     </p>
     <p>
+        Let me put this straight. If your tool fails to comply with the
+        requirements listed below, running it might both be <b>painful</b> and
+        take long for certain customers. They might spend hours or even days
+        figuring out how to make the tool work. Even if it&apos;s not
+        precisely your fault (the tool works as designed and as needed), you
+        probably <i>could</i> make life easier for all parties if you were at
+        least <i>aware</i> of constrains of some customers&apos; environments.
+    </p>
+    <p>
+        That&apos;s the whole point of this writeup. It&apos;s really not to
+        put a blame on anyone. (Certainly not on <i>you.)</i> It&apos;s to rise
+        awareness.
+    </p>
+    <p>
         Last but not least, I am a Windows guy and I work for Microsoft. Hence
         the below explanations are sometimes Windows-centric and mention several
         Windows-specific technologies as examples. However, the nature of various
         constraints
         imposed by the customers are really cross-platform, regardless of the
-        operating system or tools being uses. Please consider the below
+        operating system or tools being used. Please consider the below
         requirements even if your tools are intended to run on different operating
-        system, even though you might substitute some technology names with their
-        equivalents or counterparts.
+        system&mdash;though you might need to substitute some technology names
+        with their equivalents or counterparts.
     </p>
     <hr />
-    <h2>1.&nbsp;Compliance with Application Whitelisting solutions</h2>
+    <h2 id="1. Whitelisting">1.&nbsp;Compliance with Application Whitelisting solutions</h2>
     <p>
-        Ideally, the tool should come inbox with operating system (or other
+        Ideally, the tool should come inbox with the operating system (or other
         product that it's intended to work with&mdash;e.g. database software.)
         Even if
         you plan to update it frequently, having the initial version inbox at
@@ -127,7 +189,7 @@
             These values should not be overly generic&mdash;i.e. the tool
             should be distinguishable from others.
             <blockquote>
-                You can casually examine the values of such fields in &ldquo;File 
+                You can casually examine the values of such fields in &ldquo;File
                 Properties&rdquo; box in Windows Explorer, or by exploring
                 &rdquo;Version Info&rdquo; property in PowerShell.
             </blockquote>
@@ -171,7 +233,8 @@
     <p>
         If you are not familiar with WDAC, you can learn about it
         <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/windows-defender-application-control">
-        here</a>. However, you don't have to become a WDAC expert. If you
+            here
+        </a>. However, you don't have to become a WDAC expert. If you
         comply with the requirements listed above, you can rest assured
         that your tool does its best to comply with WDAC.<br />
     </p>
@@ -179,14 +242,16 @@
         If you happen to ship a kernel mode driver (which is very uncommon
         for troubleshooting tools) please make sure you comply with
         <a href="https://techcommunity.microsoft.com/t5/Windows-Hardware-Certification/Driver-compatibility-with-Device-Guard-in-Windows-10/ba-p/364865">
-        HVCI requirements</a> as well.
+            HVCI requirements
+        </a> as well.
     </blockquote>
 
     <p>
         The above requirements can be skipped only if the tool is a very
         simple PowerShell script which can be executed in
         <a href="https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/">
-        Constrained Language Mode</a>. If your script is fully functional
+            Constrained Language Mode
+        </a>. If your script is fully functional
         under constrained
         language mode, the above requirements are &ldquo;nice to
         have&rdquo;&mdash;but not strictly necessary.<br />
@@ -196,9 +261,9 @@
         Language Mode, please do not assume it does.
     </p>
 
-    <h2>2.&nbsp;Server Core support</h2>
+    <h2 id="2. Core">2.&nbsp;Server Core support</h2>
     <p>
-        The tool has to support 
+        The tool has to support
         Server Core installation option. This typically
         means no GUI assumptions or dependencies. Or, more precisely, no
         explorer.exe (Windows shell), no WPF, no hardware graphic acceleration,
@@ -206,10 +271,13 @@
     </p>
     <blockquote>
         You can learn more about Server Core <a href="https://docs.microsoft.com/windows-server/administration/server-core/what-is-server-core">
-        here</a>. Please note that it's not a separate edition or &ldquo;SKU&rdquo;
+            here
+        </a>. Please note that it's not a separate edition or &ldquo;SKU&rdquo;
         of Windows. It is an installation option available in <b>all</b> editions
-        of Windows Server (Standard and Datacenter), and it is <i>recommended by 
-        default</i> for most use cases.<br/>
+        of Windows Server (Standard and Datacenter), and it is <i>
+            recommended by
+            default
+        </i> for most use cases.<br />
         Unfortunately, as of today, there's not an easy way to check
         whether your tool is compatible with Server Core (other than testing it.)
         But we're working on it and appreciate your diligence.
@@ -220,7 +288,7 @@
         However, all functionality should be also available in command line.
     </p>
 
-    <h2>3.&nbsp;Current user credentials</h2>
+    <h2 id="3. Credentials">3.&nbsp;Current user credentials</h2>
     <p>
         It is very beneficial if the tool supports connecting to remote systems.
         In fact, that's one of the requirements listed below. However, you should
@@ -245,7 +313,7 @@
         fails.
     </p>
 
-    <h2>4.&nbsp;Internet connectivity</h2>
+    <h2 id="4. Internet">4.&nbsp;Internet connectivity</h2>
     <p>
         Some customers operate fully air-gapped (that is, isolated) networks.
         For this reason, the tool should not assume it always can download
@@ -257,7 +325,7 @@
         transferred to the vendor manually, if needed.
     </p>
 
-    <h2>5.&nbsp;External dependencies</h2>
+    <h2 id="5. Dependencies external">5.&nbsp;External dependencies</h2>
     <p>
         Generally, the number of dependencies should be as small as possible.
         One approach to achieve that is making the tool modular. E.g. it's
@@ -284,7 +352,7 @@
         number of dependencies with opaque scope.
     </p>
 
-    <h2>6.&nbsp;Inbox dependencies</h2>
+    <h2 id="6. Dependencies inbox">6.&nbsp;Inbox dependencies</h2>
     <p>
         Any dependency should not be assumed as granted. It needs to be explicitly
         documented (in tool's readme, accompanying email template, etc.) This
@@ -294,7 +362,7 @@
         be customers who remove them for one reason or another.
     </p>
 
-    <h2>7.&nbsp;Remote operations</h2>
+    <h2 id="7. Remote">7.&nbsp;Remote operations</h2>
     <p>
         The tool needs to support at least one of the following. (Bonus points
         if you manage to satisfy both requirements.)
@@ -336,7 +404,7 @@
         </ol>
     </p>
 
-    <h2>8.&nbsp;Permissions and privileges (local Administrator)</h2>
+    <h2 id="8. Permissions">8.&nbsp;Permissions and privileges (local Administrator)</h2>
     <p>
         It is understood if you tool requires local administrator permission
         (or equivalent) to configure something on the machine. However, please
@@ -365,14 +433,14 @@
         the time even for running the tool if that's not actually needed.
     </p>
 
-    <h2>9.&nbsp;Distribution mechanisms</h2>
+    <h2 id="9. Distribution">9.&nbsp;Distribution mechanisms</h2>
     <p>
         If possible, offer automated distribution mechanism for your tool which
         is native for the operating system (e.g. Microsoft Store) and/or the
         runtime environment (e.g. PowerShell Gallery.)
     </p>
     <p>
-        Depending on the nature and target environments of your tool, this may 
+        Depending on the nature and target environments of your tool, this may
         or may not be not the <i>only</i> way to obtain it. E.g. Microsoft
         store is not available on Windows Server, and it also cannot be easily
         used by the customers who run in air-gapped networks. However, it is the
