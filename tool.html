@@ -9,12 +9,21 @@
 </head>
 <body>
     <h1>Tools manifesto</h1>
-    <p>version 2019-08-14 by <a href="/">Artem Pronichkin</a></p>
+    <p><a href="https://github.com/pronichkin/pronichkin.github.io/blob/master/tool.html">comment or submit an edit</a> &bull version 2019-08-14 by <a href="/">Artem Pronichkin</a></p>
     <h2>TL;DR</h2>
     <p>
-        The below requirements are based on my experience working with several
+        If you develop, maintain, own a tool or utility, or repeatedly ask others
+        to use some tool, or build requirements for tools used in your processes,
+        please consider the below criteria.
+    </p>
+    <p>
+        These requirements are based on years of experience working with most
         security-cautions customers, such as banks or government agencies across
         the world.
+    </p>
+    <p>
+        In a very short way, all of the below can be reduced to: do not require or
+        assume more than needed, and document everything which is truly required.
     </p>
     <h2>The problem with today's tools</h2>
     <p>
@@ -54,7 +63,7 @@
         often not easy (either technically or operationally), or might impact
         the repro.
     </p>
-    <p>        
+    <p>
         However, the below requirements are
         in fact universal and can (or even should) be applied to any tools or
         utilities that
@@ -62,8 +71,19 @@
         hardware configuration,
         audit assessment, system deployment and configuration, etc.
     </p>
+    <p>
+        Last but not least, I am a Windows guy and I work for Microsoft. Hence
+        the below explanations are sometimes Windows-centric and mention several
+        Windows-specific technologies as examples. However, the nature of various
+        constraints
+        imposed by the customers are really cross-platform, regardless of the
+        operating system or tools being uses. Please consider the below
+        requirements even if your tools are intended to run on different operating
+        system, even though you might substitute some technology names with their
+        equivalents or counterparts.
+    </p>
     <hr />
-    <h2>1. Compliance with Application Whitelisting solutions</h2>
+    <h2>1.&nbsp;Compliance with Application Whitelisting solutions</h2>
     <p>
         Ideally, the tool should come inbox with operating system (or other
         product that it's intended to work with&mdash;e.g. database software.)
@@ -72,7 +92,7 @@
         first place (merely as a placeholder) would help
         including it into whitelisting policy. In fact, anything coming
         inbox will likely be whitelisted by default. And due to the way many
-        whitelisting solutions work, that would automatically cover future 
+        whitelisting solutions work, that would automatically cover future
         versions.
     </p>
     <p>
@@ -81,59 +101,72 @@
         with the following publishing requirements.
     </p>
     <ol type="a">
-                <li>
-                    All the files that comprise the tool itself should be
-                    digitally signed. (Preferably with Microsoft or other
-                    recognizable vendor certificate.)<br/>
-                    Please note that even WSH or PowerShell scripts can (and should)
-                    be signed. Technically, a signature looks like a block
-                    of text at the end of the script. Hence, the script
-                    can still be distributed as a text file or embedded into
-                    other, more complex structures&mdash;without invalidating
-                    the signature.<br />
-                    For this reason, the tool should not generate
-                    or modify scripts on the fly. If you need to provide
-                    variables dynamically, you can supply them as script
-                    parameters. (That would also not invalidate the signature
-                    of the script itself.)
-                </li>
-                <li>
-                    If the tool comes in the form of binary executable (.exe,
-                    .dll, etc.)
-                    the PE header should be populated with meaningful values
-                    (e.g. tool name in &ldquo;File Name&rdquo; field.) These
-                    values should not be overly generic.
-                </li>
-                <li>
-                    There should be a clear way to differentiate between
-                    tool versions. Preferably, the version should be specified
-                    in respective fields of PE header, or custom script heading.
-                </li>
-                <li>
-                    The version should <b>not</b> be included into &ldquo;File
-                    Name&rdquo; field (e.g. &ldquo;MyTool v.1.2.3.4&rdquo;).
-                    Instead, the version should be specified in the designated
-                    fields (e.g. &ldquo;File Version&rdquo;). This is because
-                    every time value of &ldquo;File Name&rdquo; field is changed,
-                    it is typically distinguished by whitelisting
-                    mechanisms as a <b>new</b> binary. Hence such file needs to
-                    be added to the policy
-                    separately&mdash;which requires rebuilding and reapplying
-                    the policy. And this often means a reboot.
-                </li>
-                <li>
-                    The above requirements also apply to whatever packaging
-                    mechanism is used for delivery. I.e. if the tool comes with
-                    a self-extracting installer, that installer should be signed.
-                    If it comes in an archive, you should use cab format or other
-                    that supports embedded digital signature. (Zip format is known
-                    to <b>not</b> support signatures, so it should be avoided.)
-                </li>
+        <li>
+            All the files that comprise the tool itself should be
+            digitally signed. (Preferably with Microsoft or other
+            recognizable vendor certificate.)<br />
+            Please note that even WSH or PowerShell scripts can (and should)
+            be signed. Technically, a signature looks like a block
+            of text at the end of the script. Hence, the script
+            can still be distributed as a text file or embedded into
+            other, more complex structures&mdash;without invalidating
+            the signature.<br />
+            For this reason, the tool should not generate
+            or modify scripts on the fly. If you need to provide
+            variables dynamically, you can supply them as script
+            parameters. (That would also not invalidate the signature
+            of the script itself.)
+        </li>
+        <li>
+            If the tool comes in the form of binary executable (.exe,
+            .dll, etc.)
+            the PE &ldquo;<a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">
+                Version Info
+            </a>&rdquo; should be present and populated with
+            meaningful values for fields like &rdquo;Original File Name&rdquo;.
+            These values should not be overly generic&mdash;i.e. the tool
+            should be distinguishable from others.
+            <blockquote>
+                You can casually examine the values of such fields in &ldquo;File 
+                Properties&rdquo; box in Windows Explorer, or by exploring
+                &rdquo;Version Info&rdquo; property in PowerShell.
+            </blockquote>
+        </li>
+        <li>
+            There should be a clear way to differentiate between
+            tool versions. Preferably, the version should be specified
+            in respective fields of PE header, or custom script heading.
+        </li>
+        <li>
+            The version should <b>not</b> be included into &ldquo;File
+            Name&rdquo; field (e.g. &ldquo;MyTool v.1.2.3.4&rdquo;).
+            Instead, the version should be specified in the designated
+            fields (e.g. &ldquo;File Version&rdquo;). This is because
+            every time value of &ldquo;File Name&rdquo; field is changed,
+            it is typically distinguished by whitelisting
+            mechanisms as a <b>new</b> binary. Hence such file needs to
+            be added to the policy
+            separately&mdash;which requires rebuilding and reapplying
+            the policy. And this often means a reboot.
+        </li>
+        <li>
+            The above requirements also apply to whatever packaging
+            mechanism is used for delivery. I.e. if the tool comes with
+            a self-extracting installer, that installer should be signed.
+            If it comes in an archive, you should use cab format or other
+            that supports embedded digital signature. (Zip format is known
+            to <b>not</b> support signatures, so it should be avoided.)
+            <blockquote>
+                The cab format is known to not support <i>folders.</i> So, if
+                your tool relies on a complex directory structure, please
+                evaluate other options&mdash;such as MSI or MSIX.
+            </blockquote>
+        </li>
     </ol>
     <p>
-                All of the above requirements are imposed by whitelisting solutions
-                such as Windows Defender Application Control (WDAC), also
-                known as &ldquo;Device Guard User Mode Code Integirty&rdquo; (UMCI).
+        All of the above requirements are imposed by whitelisting solutions
+        such as AppLocker or Windows Defender Application Control (WDAC), also
+        known as &ldquo;Device Guard User Mode Code Integirty&rdquo; (UMCI).
     </p>
     <p>
         If you are not familiar with WDAC, you can learn about it
@@ -141,35 +174,45 @@
         here</a>. However, you don't have to become a WDAC expert. If you
         comply with the requirements listed above, you can rest assured
         that your tool does its best to comply with WDAC.<br />
-    </p>        
+    </p>
     <blockquote>
-                If you happen to ship a kernel mode driver (which is very uncommon
-                for troubleshooting tools) please make sure you comply with 
-                <a href="https://techcommunity.microsoft.com/t5/Windows-Hardware-Certification/Driver-compatibility-with-Device-Guard-in-Windows-10/ba-p/364865">
-                HVCI requirements</a> as well.
+        If you happen to ship a kernel mode driver (which is very uncommon
+        for troubleshooting tools) please make sure you comply with
+        <a href="https://techcommunity.microsoft.com/t5/Windows-Hardware-Certification/Driver-compatibility-with-Device-Guard-in-Windows-10/ba-p/364865">
+        HVCI requirements</a> as well.
     </blockquote>
+
     <p>
-            The above requirements can be skipped only if the tool is a very
-            simple PowerShell script which can be executed in 
-            <a href="https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/">
-            Constrained Language Mode</a>. If your script is fully functional 
-            under constrained
-            language mode, the above requirements are &ldquo;nice to
-            have&rdquo;&mdash;but not strictly necessary.<br/>
+        The above requirements can be skipped only if the tool is a very
+        simple PowerShell script which can be executed in
+        <a href="https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/">
+        Constrained Language Mode</a>. If your script is fully functional
+        under constrained
+        language mode, the above requirements are &ldquo;nice to
+        have&rdquo;&mdash;but not strictly necessary.<br />
     </p>
     <p>
         If you are not sure whether your script supports Constrained
         Language Mode, please do not assume it does.
     </p>
 
-    <h2>2. Server Core support</h2>
+    <h2>2.&nbsp;Server Core support</h2>
     <p>
-        The tool has to support Server Core installation option. This typically 
-        means no GUI assumptions or dependencies.
+        The tool has to support 
+        Server Core installation option. This typically
+        means no GUI assumptions or dependencies. Or, more precisely, no
+        explorer.exe (Windows shell), no WPF, no hardware graphic acceleration,
+        etc.
     </p>
     <blockquote>
-        Todo: include a link to Server Core SDK or otherwise, a list of 
-        unavailable components
+        You can learn more about Server Core <a href="https://docs.microsoft.com/windows-server/administration/server-core/what-is-server-core">
+        here</a>. Please note that it's not a separate edition or &ldquo;SKU&rdquo;
+        of Windows. It is an installation option available in <b>all</b> editions
+        of Windows Server (Standard and Datacenter), and it is <i>recommended by 
+        default</i> for most use cases.<br/>
+        Unfortunately, as of today, there's not an easy way to check
+        whether your tool is compatible with Server Core (other than testing it.)
+        But we're working on it and appreciate your diligence.
     </blockquote>
     <p>
         The above does not mean your tool has to be command line <b>only.</b>
@@ -177,7 +220,7 @@
         However, all functionality should be also available in command line.
     </p>
 
-    <h2>3. Current user credentials</h2>
+    <h2>3.&nbsp;Current user credentials</h2>
     <p>
         It is very beneficial if the tool supports connecting to remote systems.
         In fact, that's one of the requirements listed below. However, you should
@@ -202,7 +245,7 @@
         fails.
     </p>
 
-    <h2>4. Internet connectivity</h2>
+    <h2>4.&nbsp;Internet connectivity</h2>
     <p>
         Some customers operate fully air-gapped (that is, isolated) networks.
         For this reason, the tool should not assume it always can download
@@ -214,7 +257,7 @@
         transferred to the vendor manually, if needed.
     </p>
 
-    <h2>5. External dependencies</h2>
+    <h2>5.&nbsp;External dependencies</h2>
     <p>
         Generally, the number of dependencies should be as small as possible.
         One approach to achieve that is making the tool modular. E.g. it's
@@ -241,32 +284,40 @@
         number of dependencies with opaque scope.
     </p>
 
-    <h2>6. Inbox dependencies</h2>
+    <h2>6.&nbsp;Inbox dependencies</h2>
     <p>
         Any dependency should not be assumed as granted. It needs to be explicitly
-        documented (in tool's readme, accompanying email template, etc.) This 
+        documented (in tool's readme, accompanying email template, etc.) This
         even applies to dependencies on any inbox components, such as PowerShell
-        modules or 32-bit subsystem (WoW64.) Even though these components are 
+        modules or 32-bit subsystem (WoW64.) Even though these components are
         included <i>by default,</i> if they can be uninstalled&mdash;there will
         be customers who remove them for one reason or another.
     </p>
 
-    <h2>7. Remote operations</h2>
+    <h2>7.&nbsp;Remote operations</h2>
     <p>
         The tool needs to support at least one of the following. (Bonus points
         if you manage to satisfy both requirements.)
         <ol type="a">
             <li>
                 Remote execution. That is, running on machine <i>A</i> while
-                analyzing or configuring machines <i>B</i> and <i>C</i>.
+                analyzing or configuring machines <i>B</i> and <i>C</i>. You
+                typically use protocols such as WinRM (WS-MAN), WMI (CIM), WCF
+                (Indigo), RPC/DCOM or others to connect to a remote system.<br />
+                Whatever
+                protocol you use, it should be explicitly documented. If any
+                custom (non-standard) protocol is used, you absolutely need
+                to document its network requirements in detail (direction,
+                transport and ports being used, as well as authentication
+                mechanisms supported.)
             </li>
             <li>
                 Support running in PowerShell remoting sessions. That typically
                 means no interactive prompts such as &ldquo;y/n&rdquo; and no
-                pop-up modal boxes (including errors or warnings.)<br/>
+                pop-up modal boxes (including errors or warnings.)<br />
                 This also includes uncommon cases such
                 as not assuming to be able to talk to winlogon process or
-                other session infrastructure or user profile artifacts. For 
+                other session infrastructure or user profile artifacts. For
                 instance, it is known that if a user has never logged on
                 interactively (e.g. via Remote Desktop services), the profile
                 is not fully created&mdash;even though their <i>user folders</i>
@@ -283,6 +334,56 @@
                 noticeable limitations.
             </li>
         </ol>
+    </p>
+
+    <h2>8.&nbsp;Permissions and privileges (local Administrator)</h2>
+    <p>
+        It is understood if you tool requires local administrator permission
+        (or equivalent) to configure something on the machine. However, please
+        be mindful about your requirements. If there is some operations that
+        do not actually require those permissions (e.g. just analyzing the
+        configuration) you better allow your tool to run as standard user. In
+        either case, please document the requirements explicitly&mdash;especially
+        if you require some special privileges (such as &ldquo;Debug Programs&rdquo;
+        or &ldquo;Generate Secuity Audits&rdquo;.) Do not assume every user who
+        runs your tool can elevate their privileges on the fly.
+    </p>
+    <p>
+        One specific example is when your tool runs on a machine to configure
+        remote systems (see <b>Requirement 7</b> above.) In this case it's
+        almost certain that your tool <i>does not need</i> Administrator
+        permissions on the &ldquo;management&rdquo; machine. And if some of the
+        users of your tool adopted certain Credential Theft Mitigation (CTM)
+        best practices (such as &ldquo;Privileged Access
+        Workstations&rdquo; or PAWs) this means that they definitely won't have
+        Administrator permission on their <i>local</i> machines (even though they
+        <b>are</b> administrators on the <i>remote</i> machines being managed.)
+    </p>
+    <p>
+        It is fine if your tool requires Administrative permissions for installation
+        and updating. Just do not assume the same permissions are available all
+        the time even for running the tool if that's not actually needed.
+    </p>
+
+    <h2>9.&nbsp;Distribution mechanisms</h2>
+    <p>
+        If possible, offer automated distribution mechanism for your tool which
+        is native for the operating system (e.g. Microsoft Store) and/or the
+        runtime environment (e.g. PowerShell Gallery.)
+    </p>
+    <p>
+        Depending on the nature and target environments of your tool, this may 
+        or may not be not the <i>only</i> way to obtain it. E.g. Microsoft
+        store is not available on Windows Server, and it also cannot be easily
+        used by the customers who run in air-gapped networks. However, it is the
+        perfect solution for many users running Windows 10. So, it's perfectly
+        fine if you provide multiple alternative installation vehicles. Having
+        more options is generally better than fewer.
+    </p>
+    <p>
+        Besides obvious benefits such as automatic updating offered by the Store,
+        packaging for it (or PowerShell Gallery) implicitly makes you comply with
+        digital signature requirements listed above.
     </p>
 </body>
 </html>
