@@ -12,11 +12,9 @@
     <p>
         version 2019-08-14 by <a href="/">Artem Pronichkin</a> &bull; submit a
         <a href="https://github.com/pronichkin/pronichkin.github.io/issues">
-            comment (&ldquo;issue&rdquo;)
-        </a> or
+        comment </a> (&ldquo;issue&rdquo;) or
         <a href="https://github.com/pronichkin/pronichkin.github.io/blob/master/tool.html">
-            edit
-        </a>
+        edit</a>
     </p>
     <h2>TL;DR</h2>
     <p>
@@ -78,8 +76,9 @@
         When supporting customers or working with commercial support organizations
         on behalf of customers, it's quite common to be asked for running a
         certain tool to troubleshoot or gather logs. It sounds very easy for
-        support people, and hence they tend to &ldquo;overrequest
-        &rdquo;&mdash;that is, ask for using more tools than needed at certain point.
+        support people, and hence they tend to 
+        &ldquo;overrequest&rdquo;&mdash;that is, ask for using more tools than 
+        needed at certain point.
     </p>
     <p>
         Unfortunately, not all tools are created equal, and some of them might be
@@ -182,9 +181,8 @@
         <li>
             If the tool comes in the form of binary executable (.exe,
             .dll, etc.)
-            the PE &ldquo;<a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">
-                Version Info
-            </a>&rdquo; should be present and populated with
+            the PE &ldquo;<a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">Version
+            Info</a>&rdquo; should be present and populated with
             meaningful values for fields like &rdquo;Original File Name&rdquo;.
             These values should not be overly generic&mdash;i.e. the tool
             should be distinguishable from others.
@@ -197,15 +195,16 @@
         <li>
             There should be a clear way to differentiate between
             tool versions. Preferably, the version should be specified
-            in respective fields of PE header, or custom script heading.
+            in respective fields of PE resource explained above, or in a custom
+            script heading.
         </li>
         <li>
-            The version should <b>not</b> be included into &ldquo;File
+            The version should <b>not</b> be included into &ldquo;Original File
             Name&rdquo; field (e.g. &ldquo;MyTool v.1.2.3.4&rdquo;).
             Instead, the version should be specified in the designated
             fields (e.g. &ldquo;File Version&rdquo;). This is because
-            every time value of &ldquo;File Name&rdquo; field is changed,
-            it is typically distinguished by whitelisting
+            every time value of &ldquo;Original File Name&rdquo; field is
+            changed, it is typically distinguished by whitelisting
             mechanisms as a <b>new</b> binary. Hence such file needs to
             be added to the policy
             separately&mdash;which requires rebuilding and reapplying
@@ -219,8 +218,9 @@
             that supports embedded digital signature. (Zip format is known
             to <b>not</b> support signatures, so it should be avoided.)
             <blockquote>
-                The cab format is known to not support <i>folders.</i> So, if
-                your tool relies on a complex directory structure, please
+                In the other hand, cab format is known to not support
+                <i>folders.</i> So, if your tool relies on a complex directory 
+                structure, please
                 evaluate other options&mdash;such as MSI or MSIX.
             </blockquote>
         </li>
@@ -233,8 +233,7 @@
     <p>
         If you are not familiar with WDAC, you can learn about it
         <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/windows-defender-application-control">
-            here
-        </a>. However, you don't have to become a WDAC expert. If you
+        here</a>. However, you don't have to become a WDAC expert. If you
         comply with the requirements listed above, you can rest assured
         that your tool does its best to comply with WDAC.<br />
     </p>
@@ -242,16 +241,14 @@
         If you happen to ship a kernel mode driver (which is very uncommon
         for troubleshooting tools) please make sure you comply with
         <a href="https://techcommunity.microsoft.com/t5/Windows-Hardware-Certification/Driver-compatibility-with-Device-Guard-in-Windows-10/ba-p/364865">
-            HVCI requirements
-        </a> as well.
+        HVCI requirements</a> as well.
     </blockquote>
 
     <p>
         The above requirements can be skipped only if the tool is a very
         simple PowerShell script which can be executed in
         <a href="https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/">
-            Constrained Language Mode
-        </a>. If your script is fully functional
+        Constrained Language Mode</a>. If your script is fully functional
         under constrained
         language mode, the above requirements are &ldquo;nice to
         have&rdquo;&mdash;but not strictly necessary.<br />
@@ -279,19 +276,22 @@
             default
         </i> for most use cases.<br />
         Unfortunately, as of today, there's not an easy way to check
-        whether your tool is compatible with Server Core (other than testing it.)
+        whether your tool is compatible with Server Core (other than
+        <i>testing</i> it.)
         But we're working on it and appreciate your diligence.
     </blockquote>
     <p>
         The above does not mean your tool has to be command line <b>only.</b>
-        It can have a GUI as long as it's not the <b>only</b> mode of operation.
-        However, all functionality should be also available in command line.
+        You are very welcome to provide a GUI&mdash;as long as it's not the 
+        <b>only</b> mode of operation.
+        However, all functionality should be <i>also</i> available in command line.
     </p>
 
     <h2 id="3. Credentials">3.&nbsp;Current user credentials</h2>
     <p>
         It is very beneficial if the tool supports connecting to remote systems.
-        In fact, that's one of the requirements listed below. However, you should
+        In fact, that's one of the recommendations <a href="#7a. Remote">provided 
+        below</a>. However, you should
         not assume that fresh credentials are <b>always required</b> for that
         (or for any other operations.)
     </p>
@@ -367,7 +367,7 @@
         The tool needs to support at least one of the following. (Bonus points
         if you manage to satisfy both requirements.)
         <ol type="a">
-            <li>
+            <li id="7a. Remote">
                 Remote execution. That is, running on machine <i>A</i> while
                 analyzing or configuring machines <i>B</i> and <i>C</i>. You
                 typically use protocols such as WinRM (WS-MAN), WMI (CIM), WCF
@@ -379,7 +379,7 @@
                 transport and ports being used, as well as authentication
                 mechanisms supported.)
             </li>
-            <li>
+            <li id="7b. PS Remoting">
                 Support running in PowerShell remoting sessions. That typically
                 means no interactive prompts such as &ldquo;y/n&rdquo; and no
                 pop-up modal boxes (including errors or warnings.)<br />
