@@ -10,7 +10,7 @@
     <body>
         <h1 id="top">Tools manifesto</h1>
         <p>
-            version 2019-08-18 by <a href="/">Artem Pronichkin</a><br/>
+            version 2019-08-19 by <a href="/">Artem Pronichkin</a><br/>
             submit a
             <a href="https://github.com/pronichkin/pronichkin.github.io/issues">
             comment</a> (&ldquo;issue&rdquo;) or
@@ -20,7 +20,8 @@
 
         <h2>tl;dr</h2>
         <p>
-            If you develop, maintain, own a tool or utility, or repeatedly ask others
+            This is about creating great tools. If you develop, maintain, own a 
+            tool or utility, or repeatedly ask others
             to use some tool, or build requirements for tools used in your processes,
             please consider the below criteria.
         </p>
@@ -34,6 +35,13 @@
             require or assume more than needed, and document everything which is
             truly required.</i>
         </p>
+
+        <center>
+            <img src="/imadethese.jpg" alt="I made these (meme)" />
+            <small>
+                <a href="http://theawkwardyeti.com/comic/gall-bladders-day/">source: the Awkward Yeti</a>
+            </small>
+        </center>
 
         <h2 id="Contents">Contents</h2>
         <p>
@@ -178,23 +186,32 @@
             <li id="1a">
                 All the files that comprise the tool itself should be
                 digitally signed. (Preferably with Microsoft or other
-                recognizable vendor certificate.)<br />
-                Please note that even WSH or PowerShell scripts can (and should)
+                recognizable vendor certificate.)
+            </li>
+            <li id="1b">
+                Ideally, the signing certificate should be the same for 
+                all versions of your tool. If there's a necessity to change
+                the certificate (e.g. it expired or was compromised), please
+                <b>announce</b> the signature change in advance to your users.
+            </li>
+            <li id="1c">
+                Note that even WSH or PowerShell scripts can (and should)
                 be signed. Technically, a signature looks like a block
                 of text at the end of the script. Hence, the script
                 can still be distributed as a text file or embedded into
-                other, more complex structures&mdash;without invalidating
-                the signature.<br />
-                For this reason, the tool should not generate
+                other, more complex structures (e.g. XML)&mdash;without 
+                invalidating the signature.
+            </li>
+            <li id="1d">
+                For the above reason, the tool should not generate
                 or modify scripts on the fly. If you need to provide
                 variables dynamically, you can supply them as script
                 parameters. (That would also not invalidate the signature
                 of the script itself.)
             </li>
-            <li id="1b">
+            <li id="1e">
                 If the tool comes in the form of binary executable (.exe,
-                .dll, etc.)
-                the PE &ldquo;<a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">Version
+                .dll, etc.) the PE &ldquo;<a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">Version
                 Info</a>&rdquo; should be present and populated with
                 meaningful values for fields like &rdquo;Original File Name&rdquo;.
                 These values should not be overly generic&mdash;i.e. the tool
@@ -205,13 +222,13 @@
                     &rdquo;Version Info&rdquo; property in PowerShell.
                 </blockquote>
             </li>
-            <li id="1c">
+            <li id="1f">
                 There should be a clear way to differentiate between
                 tool versions. Preferably, the version should be specified
                 in respective fields of PE resource explained above, or in a custom
                 script heading.
             </li>
-            <li id="1d">
+            <li id="1g">
                 The version should <b>not</b> be included into &ldquo;Original File
                 Name&rdquo; field (e.g. &ldquo;MyTool v.1.2.3.4&rdquo;).
                 Instead, the version should be specified in the designated
@@ -223,7 +240,7 @@
                 separately&mdash;which requires rebuilding and reapplying
                 the policy. And this often means a reboot.
             </li>
-            <li id="1e">
+            <li id="1h">
                 The above requirements also apply to whatever packaging
                 mechanism is used for delivery. I.e. if the tool comes with
                 a self-extracting installer, that installer should be signed.
@@ -472,9 +489,10 @@
             <b>are</b> administrators on the <i>remote</i> machines being managed.)
         </p>
         <p>
-            It is fine if your tool requires Administrative permissions for installation
-            and updating. Just do not assume the same permissions are available all
-            the time even for running the tool if that's not actually needed.
+            It is fine if your tool requires Administrative permissions for 
+            installation and updating. Just do not assume the same permissions 
+            are available all the time even for running the tool, and do not 
+            require process elevation unless actually needed.
         </p>
         <p>
             <a href="#top">back to top</a>
