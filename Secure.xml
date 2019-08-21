@@ -1,25 +1,45 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--  Sample Answer file for "Secure" (that is, either Shielded or Encryption
-      supported) virtual machines
-      Last edit 2019-06-12 by Artem Pronichkin
-      For explanation please see https://pronichkin.com -->
+<!--  Sample Answer file for “Secure” (that is, either Shielded
+      or Encryption supported) virtual machines.
+      
+      Partially based on the output of “New-ShieldingDataAnswerFile” function
+      from “GuardedFabricTools” module version 0.2.0.
+      https://www.powershellgallery.com/packages/GuardedFabricTools/0.2.0/Content/ShieldingDataAnswerFile.psm1
+      (Functionality of this function was reduced since version 1.0.0.)
+      
+      Last edit 2019-08-21 by Artem Pronichkin
+      For explanation please see https://pronichkin.com  -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
   <settings pass="specialize">
-    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-Shell-Setup" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <RegisteredOwner>IT Department</RegisteredOwner>
       <RegisteredOrganization>Contoso</RegisteredOrganization>
       <ComputerName>@ComputerName@</ComputerName>
       <ProductKey>@ProductKey@</ProductKey>
     </component>
-    <!-- This is where all the RunSynchronousCommand lies. You can add extra commands here -->
-    <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <!--  This is where all the RunSynchronousCommand lies. You can add extra
+          commands here. Note that the numbering in “Order” values should be
+          consistent without skipping  -->
+    <component name="Microsoft-Windows-Deployment" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <RunSynchronous>
-        <!-- We are creating our own SetupComplete.cmd to run scripts during the setup process. Add commands to this cmd file if you have custom setup actions to do -->
+        <!--  All files attached to the PDK will end up in C:\temp\, hence this
+              will run the setup script you have included  -->        
         <RunSynchronousCommand wcm:action="add">
           <Description>Disable the built-in Administrator account</Description>
           <Order>1</Order>
           <Path>net.exe user Administrator /active:no</Path>
         </RunSynchronousCommand>
+        <!--  We are creating our own SetupComplete.cmd to run scripts during 
+              the setup process. Add commands to this cmd file if you have 
+              custom setup actions to do  -->
         <RunSynchronousCommand wcm:action="add">
           <Description>If there is one, copy original setupcomplete.cmd to a unique file</Description>
           <Order>2</Order>
@@ -30,8 +50,9 @@
           <Description>mkdir Scripts since Windows looks for SetupComplete.cmd in that dir. If the dir exists, it should be fine.</Description>
           <Path>cmd.exe /C mkdir %WinDir%\Setup\Scripts</Path>
         </RunSynchronousCommand>
-        <!-- Cleaning up answer files after deployment because they might contain secrets -->
-        <!-- Note: you might want to disable this for troubleshooting -->
+        <!--  Cleaning up answer files after deployment because they might 
+              contain secrets
+              Note: you might want to disable this for troubleshooting  -->
         <RunSynchronousCommand wcm:action="add">
           <Description>Delete the answer file from C:</Description>
           <Order>4</Order>
@@ -42,8 +63,8 @@
           <Order>5</Order>
           <Path>cmd.exe /C echo del %WinDir%\Panther\Unattend.xml &gt;&gt; %WinDir%\Setup\Scripts\SetupComplete.cmd</Path>
         </RunSynchronousCommand>
-        <!-- All files attached to the PDK will end up in C:\temp\, hence this will run the setup script you have included -->
-        <!-- This is writing a CreateScheduledTask PowerShell Script that creates a startup task -->
+        <!--  This is writing a CreateScheduledTask PowerShell Script that 
+              creates a startup task  -->
         <RunSynchronousCommand wcm:action="add">
           <Order>6</Order>
           <Description>Create the CreateScheduledTask Script Part 1/7</Description>
@@ -75,7 +96,8 @@
      <!-- <Path>cmd.exe /C echo -Description "Backup BitLocker Recovery Password to AD" -User "%ComputerName%\Administrator" -Password "redacted" -Settings $Stset &gt;&gt; %WinDir%\Setup\Scripts\CreateScheduledTask.ps1</Path>  -->
           <Path>cmd.exe /C echo -Description "Backup BitLocker Recovery Password to AD" -User "System" -Settings $Stset &gt;&gt; %WinDir%\Setup\Scripts\CreateScheduledTask.ps1</Path>
         </RunSynchronousCommand>
-        <!-- Cleanup. This is no longer needed as we don't store password in the script anymore -->
+        <!--  Cleanup. This is no longer needed as we don't store password
+              in the script anymore  -->
    <!-- <RunSynchronousCommand wcm:action="add">
           <Order>12</Order>
           <Description>Create the CreateScheduledTask Script Part 7/7</Description>
@@ -86,7 +108,9 @@
           <Description>Create the CreateScheduledTask Script Part 7/7</Description>
           <Path>cmd.exe /C echo Stop-Transcript &gt;&gt; %WinDir%\Setup\Scripts\CreateScheduledTask.ps1</Path>
         </RunSynchronousCommand>
-        <!-- This is writing a Script that runs to create a KeyProtector that uses a recovery password, and it will back up to the Active Directory -->
+        <!--  This is writing a Script that runs to create a KeyProtector that
+              uses a recovery password, and it will back up to the Active
+              Directory  -->
         <RunSynchronousCommand wcm:action="add">
           <Order>13</Order>
           <Description>Create the BitLockerRecoveryPassword Script Part 1/6</Description>
@@ -127,7 +151,8 @@
           <Description>Run the CreateScheduledTask Script</Description>
           <Path>cmd.exe /C echo PowerShell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File %WinDir%\Setup\Scripts\CreateScheduledTask.ps1 &gt;&gt; %WinDir%\Setup\Scripts\SetupComplete.cmd</Path>
         </RunSynchronousCommand>
-        <!-- Restart Network Location Awareness (NLA) service to workaround an issue in 1809 (RS5) -->
+        <!--  Restart Network Location Awareness (NLA) service to workaround
+              an issue with Firewall profile detection in 2019/1809 (RS5)  -->
         <RunSynchronousCommand wcm:action="add">
           <Order>20</Order>
           <Description>Disable the “Network List Service” so that it does not start automatically in the middle, blocking NLA from stopping</Description>
@@ -155,41 +180,49 @@
           <Description>Start the “Network Location Awareness” service</Description>
           <Path>cmd.exe /C echo net.exe start NlaSvc &gt;&gt; %WinDir%\Setup\Scripts\SetupComplete.cmd</Path>
         </RunSynchronousCommand>        
-        <!-- Windows Defender definition update, because otherwise Tamper Protection will block application of Group Policy in 1903 -->
+        <!--  Windows Defender definition update, because otherwise “Tamper
+              Protection” will block application of Group Policy in 1903  -->
         <RunSynchronousCommand wcm:action="add">
           <Order>25</Order>
           <Description>Add Windows Defender definition update in SetupComplete.cmd</Description>
           <Path>cmd.exe /C echo "\\server.domain.com\Install\Defender\x64\mpam-fe.exe" &gt;&gt; %WinDir%\Setup\Scripts\SetupComplete.cmd</Path>
           <WillReboot>OnRequest</WillReboot>
         </RunSynchronousCommand>
-        <!-- LAPS installation -->
+        <!--  LAPS installation  -->
         <RunSynchronousCommand wcm:action="add">
           <Order>26</Order>
           <Description>Add LAPS installation in SetupComplete.cmd</Description>
           <Path>cmd.exe /C echo MsiExec.exe /Passive /NoRestart /Package "\\server.domain.com\Install\laps.x64.msi" ADDLOCAL=CSE &gt;&gt; %WinDir%\Setup\Scripts\SetupComplete.cmd</Path>
           <WillReboot>OnRequest</WillReboot>
         </RunSynchronousCommand>
-        <!-- OpsMgr Agent installation -->
+        <!--  OpsMgr Agent installation  -->
         <RunSynchronousCommand wcm:action="add">
           <Order>27</Order>
           <Description>Add OpsMgr Agent installation in SetupComplete.cmd</Description>
           <Path>cmd.exe /C echo MsiExec.exe /Passive /NoRestart /Package "\\server.domain.com\Install\Microsoft Monitoring Agent\MOMAgent.msi" AcceptEndUserLicenseAgreement=1 &gt;&gt; %WinDir%\Setup\Scripts\SetupComplete.cmd</Path>
           <WillReboot>OnRequest</WillReboot>
         </RunSynchronousCommand>
-        <!-- This shuts down the VM -->
-        <!-- Note: you MUST comment this out for Physical Computer deployment or regular (non-secured) VM deployment -->
-        <!-- Note: you MUST uncomment this out for secured (Shielded or Encryption Supported) VM deployment -->
+        <!--  This shuts down the VM
+              Note: you MUST comment this out for Physical Computer deployment 
+                    or regular (non-secured) VM deployment
+              Note: you MUST uncomment this out for “Secure” (Shielded or 
+                    Encryption Supported) VM deployment  -->
         <RunSynchronousCommand wcm:action="add">
           <Order>28</Order>
           <Description>Put shutdown VM in SetupComplete.cmd</Description>
           <Path>cmd.exe /C echo Shutdown.exe /s /f &gt;&gt; %WinDir%\Setup\Scripts\SetupComplete.cmd</Path>
           <WillReboot>OnRequest</WillReboot>
         </RunSynchronousCommand>
-        <!-- Note: VMM will add its own commands below in case Physical Computer deployment or regular (non-secured) VM deployment -->
+        <!--  Note: VMM will add its own commands below in case of Physical
+              Computer deployment or regular (non-secured) VM deployment  -->
       </RunSynchronous>
     </component>
-    <!-- Since you are using StaticIP, you must specify all these parameters -->
-    <component name="Microsoft-Windows-TCPIP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <!--  Since you are using StaticIP, you must specify all these parameters  -->
+    <component name="Microsoft-Windows-TCPIP" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <Interfaces>
         <Interface wcm:action="add">
           <Ipv4Settings>
@@ -209,7 +242,11 @@
         </Interface>
       </Interfaces>
     </component>
-    <component name="Microsoft-Windows-DNS-Client" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-DNS-Client" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <Interfaces>
         <Interface wcm:action="add">
           <EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
@@ -224,8 +261,19 @@
         </Interface>
       </Interfaces>
     </component>
-    <!-- You must provide credentials to join a domain -->
-    <component name="Microsoft-Windows-UnattendedJoin" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <!--  You must provide credentials to join a domain  -->
+    <!--  If you do not join machine to the domain here (i.e. join a workgroup),
+          consider adding known (not necessarily trusted by default) certificate
+          for RDP and/or WinRM. (Use custom script to configure it, e.g. called 
+          from SetupComplete.cmd. See “New-ShieldingDataAnswerFile” function for
+          examples.) Otherwise, you cannot ensure you are initially connecting 
+          to the machine you expect. This means your configuration is ultimately
+          untrusted  -->
+    <component name="Microsoft-Windows-UnattendedJoin" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <Identification>
         <Credentials>
           <Domain>domain</Domain>
@@ -233,31 +281,50 @@
           <Password>redacted</Password>
         </Credentials>
         <JoinDomain>domain.com</JoinDomain>
-        <!-- Note: The below is ignored if computer account is already pre-staged in Active Directory -->
-      <MachineObjectOU>OU=Staging,OU=Tier 1 Servers,DC=domain,DC=com</MachineObjectOU>
+        <!--  Note: The following is ignored if computer account is already
+              pre-staged in Active Directory  -->
+        <MachineObjectOU>OU=Staging,OU=Tier 1 Servers,DC=domain,DC=com</MachineObjectOU>
       </Identification>
     </component>
-    <component name="Microsoft-Windows-TerminalServices-LocalSessionManager" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-TerminalServices-LocalSessionManager" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <!--  Enable Remote Desktop (RDP)  -->
       <fDenyTSConnections>false</fDenyTSConnections>
     </component>
-    <component name="Microsoft-Windows-TerminalServices-RDP-WinStationExtensions" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-TerminalServices-RDP-WinStationExtensions" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <!--  Enforce usage of TLS for RDP  -->
       <SecurityLayer>2</SecurityLayer>
+      <!--  Enforce Network-Level user authentication (NLA)  -->
       <UserAuthentication>1</UserAuthentication>      
  <!-- <UserAuthentication>0</UserAuthentication>  -->
     </component>
-    <component name="Networking-MPSSVC-Svc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Networking-MPSSVC-Svc" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <FirewallGroups>
-        <!-- Allow RDP connections through the firewall -->
+        <!--  Allow RDP connections through the firewall  -->
         <FirewallGroup wcm:action="add" wcm:keyValue="RemoteDesktop">
           <Active>true</Active>
           <Group>@FirewallAPI.dll,-28752</Group>
           <Profile>domain</Profile>
         </FirewallGroup>
+        <!--  File and Printer sharing (includes incoming ICMP/Ping)  -->
         <FirewallGroup wcm:action="add" wcm:keyValue="FPS">
           <Active>true</Active>
           <Group>@FirewallAPI.dll,-28502</Group>
           <Profile>domain</Profile>
         </FirewallGroup>
+        <!--  Block various broadcast-like exceptions that sometimes
+              are enabled by default  -->
         <FirewallGroup wcm:action="add" wcm:keyValue="AllJoyn">
           <Active>false</Active>
           <Group>@FirewallAPI.dll,-37002</Group>
@@ -282,10 +349,18 @@
     </component>
   </settings>
   <settings pass="oobeSystem">
-    <component name="Microsoft-Windows-WinRE-RecoveryAgent" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-WinRE-RecoveryAgent" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <UninstallWindowsRE>true</UninstallWindowsRE>
     </component>
-    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-Shell-Setup" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
         <HideLocalAccountScreen>true</HideLocalAccountScreen>
@@ -293,20 +368,25 @@
         <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>        
         <ProtectYourPC>1</ProtectYourPC>
-        <!-- Below three are deprecated and technically not necessary, but included for completeness -->
+        <!--  Below three are deprecated and technically not necessary,
+              but included for completeness  -->
         <NetworkLocation>Work</NetworkLocation>
         <SkipUserOOBE>true</SkipUserOOBE>
         <SkipMachineOOBE>true</SkipMachineOOBE>
-        <!-- Below MUST be commented out for Physical Computer deployment -->
+        <!--  The following MUST be commented out for any non-VM
+              (Physical Computer) deployment  -->
         <VMModeOptimizations>
           <SkipAdministratorProfileRemoval>true</SkipAdministratorProfileRemoval>
           <SkipNotifyUILanguageChange>true</SkipNotifyUILanguageChange>
           <SkipWinREInitialization>true</SkipWinREInitialization>
         </VMModeOptimizations>
       </OOBE>
-      <!-- You can add extra user accounts here -->
-      <!-- You do not have to provide password for local Administrator -->
-      <!-- Empty password means the account cannot be used remotely -->
+      <!--  You can add extra user accounts here  -->
+      <!--  You do not have to provide password for local Administrator
+            or otherwise specify this section. If you leave it commented,
+            Administrator account would have empty (blank) password.
+            That means the account cannot be used remotely. (Note that local
+            console connections are not available for Shielded VMs.)  -->
  <!-- <UserAccounts>
         <AdministratorPassword>
           <Value>redacted</Value>
@@ -315,7 +395,11 @@
       </UserAccounts>  -->
       <TimeZone>@TimeZone@</TimeZone>
     </component>
-    <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-International-Core" 
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+               language="neutral" versionScope="nonSxS" 
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
  <!-- <InputLocale>en-US; fr-BE</InputLocale>  -->
  <!-- <InputLocale>0409:00000409</InputLocale>  -->
  <!-- <InputLocale>1809:00000409; 1809:0000080c</InputLocale>  -->
