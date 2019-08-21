@@ -1,4 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--  Sample Answer file for "Regular" use (that is, either bare-metal or 
+      non-Shielded virtual machines)
+      Last edit 2019-06-12 by Artem Pronichkin
+      For explanation please see https://pronichkin.com -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
   <settings pass="specialize">
     <!-- This is where all the RunSynchronousCommand lies. You can add extra commands here -->

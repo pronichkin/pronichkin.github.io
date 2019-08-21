@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- Answer file for ACCEPTANCE FABRIC, last edit 2019-06-12 by Philippe SIMONS -->
+<!--  Sample Answer file for "Secure" (that is, either Shielded or Encryption
+      supported) virtual machines
+      Last edit 2019-06-12 by Artem Pronichkin
+      For explanation please see https://pronichkin.com -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
   <settings pass="specialize">
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
