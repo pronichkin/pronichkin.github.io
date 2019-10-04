@@ -1,7 +1,7 @@
 ﻿using System;
 
 using System.Runtime.InteropServices;
-public class AdjPriv
+public class AdjustTokenPrivilege
 {
     [DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
     internal static extern bool AdjustTokenPrivileges(IntPtr htok, bool disall,

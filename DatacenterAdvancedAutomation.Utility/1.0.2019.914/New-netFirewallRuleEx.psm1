@@ -463,17 +463,20 @@ New-netFirewallRuleEx
 
                                     $AvailabilityGroupClusterGroup = $AvailabilityGroupClusterResourceCurrent.OwnerGroup
 
-                                  # Derive an IP Address from the parent Cluster Group.
+                                  # Derive an IP Address from the parent Cluster Group
 
                                     $AvailabilityGroupClusterGroupResource = Get-ClusterResource -InputObject $AvailabilityGroupClusterGroup
                                     
                                     $IpAddressAvailabilityGroupResource  = $AvailabilityGroupClusterGroupResource |
-                                        Where-Object -FilterScript { $psItem.ResourceType -eq "IP Address" }
+                                        Where-Object -FilterScript { $psItem.ResourceType -eq 'IP Address' }
                                     
-                                    $IpAddressAvailabilityGroupParameter =
-                                        Get-ClusterParameter -InputObject $IpAddressAvailabilityGroupResource -Name "Address"
+                                    $IpAddressAvailabilityGroupResource | ForEach-Object -Process {
+
+                                        $IpAddressAvailabilityGroupParameter =
+                                            Get-ClusterParameter -InputObject $psItem -Name 'Address'
                                     
-                                    $IpAddressAvailabilityGroupString   += $IpAddressAvailabilityGroupParameter.Value
+                                        $IpAddressAvailabilityGroupString += $IpAddressAvailabilityGroupParameter.Value
+                                    }
 
                                     Write-Verbose -Message "AO AG Address count: $($IpAddressAvailabilityGroupString.Count)"
                                     $IpAddressAvailabilityGroupString | Write-Verbose
@@ -524,13 +527,14 @@ New-netFirewallRuleEx
                         }
                     }
 
-                    $GetCimInstanceParam = @{
+                    $InstanceParam = @{
 
-                        ClassName  = "Win32_Service"
+                        ClassName  = 'Win32_Service'
                         Filter     = "DisplayName like '%$ServiceNameDisplay'"
                         cimSession = $ClusterNodeAddress[0]
+                        Verbose    = $False
                     }
-                    $Service = Get-CimInstance @GetCimInstanceParam
+                    $Service = Get-CimInstance @InstanceParam
 
                     $ServiceNameShort   = $Service.Name
                     $ServiceDescription = $Service.Description

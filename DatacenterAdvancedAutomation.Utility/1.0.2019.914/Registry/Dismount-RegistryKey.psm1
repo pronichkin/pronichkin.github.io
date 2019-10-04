@@ -1,9 +1,11 @@
-#Requires -RunAsAdministrator
+<#
+    #Requires -RunAsAdministrator
+#>
 
 Set-StrictMode -Version 'Latest'
 
 Function
-Dismount-RegistryHive
+Dismount-RegistryKey
 {
     [CmdletBinding()]
     param(
@@ -33,11 +35,6 @@ Dismount-RegistryHive
 
         $Result = $Reg::RegUnLoadKey( $HKLM, $Hive )
 
-    }
-    Catch
-    {
-        Throw
-    }
-
     Return $null
+    }
 }
