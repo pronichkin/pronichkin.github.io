@@ -7,7 +7,7 @@
       https://www.powershellgallery.com/packages/GuardedFabricTools/0.2.0/Content/ShieldingDataAnswerFile.psm1
       (Functionality of this function was reduced since version 1.0.0.)
       
-      Last edit 2019-08-21 by Artem Pronichkin
+      Last edit 2019-10-29 by Artem Pronichkin
       For explanation please see https://pronichkin.com  -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
   <settings pass="specialize">
@@ -382,17 +382,29 @@
         </VMModeOptimizations>
       </OOBE>
       <!--  You can add extra user accounts here  -->
-      <!--  You do not have to provide password for local Administrator
-            or otherwise specify this section. If you leave it commented,
-            Administrator account would have empty (blank) password.
-            That means the account cannot be used remotely. (Note that local
-            console connections are not available for Shielded VMs.)  -->
- <!-- <UserAccounts>
-        <AdministratorPassword>
+      <UserAccounts>
+  <!--  You do not have to provide password for local Administrator
+        or otherwise specify this section. If you leave it commented,
+        Administrator account would have empty (blank) password.
+        That means the account cannot be used remotely.
+        (Note that local console connections are not available
+        for Shielded VMs.)  -->
+   <!-- <AdministratorPassword>
           <Value>redacted</Value>
           <PlainText>false</PlainText>
-        </AdministratorPassword>
-      </UserAccounts>  -->
+        </AdministratorPassword>  -->
+        <DomainAccounts>
+          <DomainAccountList wcm:action="add">
+            <DomainAccount wcm:action="add">
+              <Name>Server Admin Group</Name>
+              <Group>Administrators</Group>
+            </DomainAccount>
+            <!--  It's important to use flat (NetBIOS-style) domain name here,
+                  not a FQDN  -->
+            <Domain>Contoso</Domain>
+          </DomainAccountList>
+        </DomainAccounts>        
+      </UserAccounts>
       <TimeZone>@TimeZone@</TimeZone>
     </component>
     <component name="Microsoft-Windows-International-Core" 
