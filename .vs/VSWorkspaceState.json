@@ -1,7 +1,16 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\DatacenterAdvancedAutomation.Process",
+    "\\DatacenterAdvancedAutomation.Process\\1.0.2020.105",
+    "\\DatacenterAdvancedAutomation.Utility",
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2019.1227",
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2019.1227\\Registry",
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2019.1227\\TokenPrivilege",
+    "\\DismEx",
+    "\\DismEx\\1.0.2019.1227",
+    "\\Garbage"
   ],
-  "SelectedNode": "\\CredentialGuard.html",
+  "SelectedNode": "\\DatacenterAdvancedAutomation.Process\\1.0.2020.105\\Get-ProcessToken.psm1",
   "PreviewInSolutionExplorer": false
 }
