@@ -1,16 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\DatacenterAdvancedAutomation.Process",
-    "\\DatacenterAdvancedAutomation.Process\\1.0.2020.105",
-    "\\DatacenterAdvancedAutomation.Utility",
-    "\\DatacenterAdvancedAutomation.Utility\\1.0.2019.1227",
-    "\\DatacenterAdvancedAutomation.Utility\\1.0.2019.1227\\Registry",
-    "\\DatacenterAdvancedAutomation.Utility\\1.0.2019.1227\\TokenPrivilege",
-    "\\DismEx",
-    "\\DismEx\\1.0.2019.1227",
-    "\\Garbage"
+    "\\OEM branding sample",
+    "\\Server Configuration sample"
   ],
-  "SelectedNode": "\\DatacenterAdvancedAutomation.Process\\1.0.2020.105\\Get-ProcessToken.psm1",
+  "SelectedNode": "\\OEM branding sample\\new-vm.ps1",
   "PreviewInSolutionExplorer": false
 }
