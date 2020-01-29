@@ -104,7 +104,7 @@ $netAdapter | Sort-Object -Property @( 'psComputerName', 'MacAddress' ) | ForEac
 
                 $Message = '      Waiting for the address to come online'
                 Write-Debug -Message $Message
-                Start-Sleep -Seconds 1
+                Start-Sleep -Seconds 3
             }
 
             $ipAddressCurrentInt = ConvertFrom-netIpAddress -ipAddress $ipAddressCurrent

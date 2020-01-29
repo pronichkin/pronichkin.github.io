@@ -1,4 +1,4 @@
-﻿Import-Module -Name @( 'NetTCPIP', 'NetAdapter', 'dnsClient', 'FailoverClusters' ) -Verbose:$False
+﻿Import-Module -Name @( 'NetTCPIP', 'NetAdapter', 'dnsClient', 'FailoverClusters', 'dism' ) -Verbose:$False
 
 $VerbosePreference     = 'Continue'
 $DebugPreference       = 'Continue'

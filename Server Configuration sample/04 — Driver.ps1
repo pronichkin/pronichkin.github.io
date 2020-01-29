@@ -2,7 +2,7 @@
 
 $psSession | ForEach-Object -Process {
 
-    Copy-Item -Path ".\Downloads\$Name.zip" -ToSession $psItem -Destination ( Join-Path -Path $env:SystemRoot -ChildPath 'Temp' )
+    Copy-Item -Path "$($env:UserProfile)\Downloads\$Name.zip" -ToSession $psItem -Destination ( Join-Path -Path $env:SystemRoot -ChildPath 'Temp' )
 }
 
 Invoke-Command -Session $psSession -ScriptBlock {

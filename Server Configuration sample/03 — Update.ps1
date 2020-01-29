@@ -47,5 +47,14 @@ If
         Write-Verbose -Message $Message
     }
 
-    Restart-Computer -ComputerName $Restart.psComputerName -Wait -Force
+ <# -Protocol 'dcom' (which is the default) fails with:
+    
+   “Fail to retrieve its LastBootUpTime via the WMI service with the following 
+    error message: Call was canceled by the message filter.
+    (Exception from HRESULT: 0x80010002 (RPC_E_CALL_CANCELED))”
+    
+    in case computer was never restarted yet
+  #>
+
+    Restart-Computer -ComputerName $Restart.psComputerName -Wait -Protocol WSMan -Force
 }
