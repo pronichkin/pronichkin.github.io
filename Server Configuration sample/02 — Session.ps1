@@ -22,6 +22,9 @@ $psSession  = [System.Collections.Generic.List[
     $Name.Add( 'Kepler' + $psItem.ToString( 'D3' ) )
 }
 
+$Name.Add( 'ArtemP-hvs01c' )
+$Name.Add( 'ArtemP-hvs02f' )
+
 $Name | ForEach-Object -Process {
     Resolve-DnsName -Name $psItem -Verbose:$False -Debug:$False | ForEach-Object -Process { 
         $Record.Add( $psItem )

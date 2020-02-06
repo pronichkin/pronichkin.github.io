@@ -5,7 +5,7 @@
     Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'
 
     [System.Void](
-        New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation' -Name 'AllowProtectedCreds' -PropertyType 'dWord' -Value 1
+        New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation' -Name 'AllowProtectedCreds' -PropertyType 'dWord' -Value 1 -Force
     )
 }
 
