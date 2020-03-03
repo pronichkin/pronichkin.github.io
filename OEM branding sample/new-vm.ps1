@@ -1,6 +1,7 @@
-$Name      = 'Contoso HCI'
-$Path      = 'D:\Virtual Machine'
-$ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVERHYPERCORE_OEM_x64FRE_en-us_1.iso'
+  $Name      = 'Proseware HCI'
+  $Path      = 'D:\Virtual Machine'
+# $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVERHYPERCORE_OEM_x64FRE_en-us_1.iso'
+  $ImagePath = 'D:\Image\SW_DVD9_Win_Server_STD_CORE_2019_1809.2_64Bit_English_DC_STD_MLF_X22-18452.ISO'
 
 $vm = Get-vm | Where-Object -FilterScript {
     $psItem.Name -eq $Name

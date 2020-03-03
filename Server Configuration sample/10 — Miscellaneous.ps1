@@ -13,12 +13,8 @@ Invoke-Command -Session $psSession -ScriptBlock {
 
     Add-LocalGroupMember -Group 'Administrators' -Member @(
 
-        'muthus@microsoft.com'
-        'cosdar@microsoft.com'
-        'tisaacs@microsoft.com'
-        'saisa@microsoft.com'
-        'brentf@microsoft.com'
-        'jol@microsoft.com'
+        'redmond.corp.microsoft.com\KeplerLabUser'
+      # 'KeplerLabUser@redmond.corp.microsoft.com'
     )
 }
 
