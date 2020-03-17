@@ -9,12 +9,12 @@ Import-Module -Name 'Storage' -Verbose:$False
     Note
 
     Formatted output is not intended for programmatic use (e.g. consumption
-    from pipeline or variables.) “Get-bcdObjectElement” provides raw output 
+    from pipeline or variables.) “Get-bcdElement” provides raw output 
     which is more suitable for these scenarios
 #>
 
 Function
-Get-bcdObjectElementDevice
+Get-bcdElementDevice
 {
     [CmdletBinding()]
 
@@ -143,12 +143,12 @@ Get-bcdObjectElementDevice
                     }
                     $Object             = Get-bcdObject @ObjectParam
 
-                    $ElementQualified   = Get-bcdObjectElement -Object $Object -Type $Element.Type -Flag Qualified
+                    $ElementQualified   = Get-bcdElement -Object $Object -Type $Element.Type -Flag Qualified
 
                     $ElementParamCurrent = $ElementParam.Clone()
                     $ElementParamCurrent.Add( 'Device', $ElementQualified.Device )
 
-                    $PartitionQualified = Get-bcdObjectElementDevice @ElementParamCurrent
+                    $PartitionQualified = Get-bcdElementDevice @ElementParamCurrent
 
                     $Value.Add( 'Partition', $PartitionQualified.Partition )
 
@@ -169,7 +169,7 @@ Get-bcdObjectElementDevice
                     $ElementParam.Add( 'Device', $Device )
                 }
 
-                $AdditionalOption = Get-bcdObjectElementAdditionalOption @ElementParam
+                $AdditionalOption = Get-bcdElementAdditionalOption @ElementParam
 
                 $Value.Add( 'Additional Options'  ,  $AdditionalOption )
                 $Value.Add( 'Path'                ,  $Device.Path      )
@@ -187,7 +187,7 @@ Get-bcdObjectElementDevice
                 $ElementParamCurrent = $ElementParam.Clone()
                 $ElementParamCurrent.Add( 'Device', $Device.Parent )
 
-                $Parent = Get-bcdObjectElementDevice @ElementParamCurrent
+                $Parent = Get-bcdElementDevice @ElementParamCurrent
 
                 If
                 (
@@ -211,7 +211,7 @@ Get-bcdObjectElementDevice
                     $ElementParam.Add( 'Device', $Device )
                 }
 
-                $AdditionalOption = Get-bcdObjectElementAdditionalOption @ElementParam
+                $AdditionalOption = Get-bcdElementAdditionalOption @ElementParam
 
                 $Value.Add( 'Additional Options'  ,  $AdditionalOption )
                 $Value.Add( 'Parent'              ,  $Parent           )
@@ -270,7 +270,7 @@ Get-bcdObjectElementDevice
                     $ElementParam.Add( 'Device', $Device )
                 }
 
-                $AdditionalOption = Get-bcdObjectElementAdditionalOption @ElementParam
+                $AdditionalOption = Get-bcdElementAdditionalOption @ElementParam
 
                 $Value.Add( 'Additional Options'  ,  $AdditionalOption )
             }

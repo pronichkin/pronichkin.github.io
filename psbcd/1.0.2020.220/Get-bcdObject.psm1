@@ -5,7 +5,7 @@ Function
 Get-bcdObject
 {
     [OutputType(
-        'Microsoft.Management.Infrastructure.CimInstance#ROOT/WMI/BcdObject'
+        'Microsoft.Management.Infrastructure.cimInstance#Root/WMI/bcdObject'
     )]
 
     [CmdletBinding(
@@ -20,9 +20,9 @@ Get-bcdObject
         )]
         [ValidateNotNullOrEmpty()]
         [psTypeName(
-            'Microsoft.Management.Infrastructure.CimInstance#ROOT/WMI/BcdStore'
+            'Microsoft.Management.Infrastructure.cimInstance#Root/WMI/bcdStore'
         )]
-        [Microsoft.Management.Infrastructure.CimInstance]
+        [Microsoft.Management.Infrastructure.cimInstance]
         $Store
     ,
         [Parameter(
@@ -46,15 +46,15 @@ Get-bcdObject
         )]
         [ArgumentCompleter(
             {
-                $ObjectWellKnown.Values
+                $ObjectWellKnown.Keys
             }
         )]
         [ValidateScript(
             {
-                $psItem -in $ObjectWellKnown.Values
+                $ObjectWellKnown.ContainsKey( $psItem )
             }
         )]
-        [System.String]
+        [System.String[]]
         $WellKnownID
     ,
 
@@ -69,7 +69,7 @@ Get-bcdObject
     ,
 
       # Format for human-readable output. This mode is mostly intended for
-      # manual navigation via child objects
+      # manual exploration of child objects
 
         [Parameter(
             Mandatory = $False
@@ -78,48 +78,11 @@ Get-bcdObject
         $Format
     )
 
- <# DynamicParam
-    {
-        $Attribute = [System.Management.Automation.ParameterAttribute]::new()
-
-        $Attribute.ParameterSetName = [System.Management.Automation.ParameterAttribute]::AllParameterSets
-        $Attribute.Mandatory        = $False
-
-        $AttributeCollection = [System.Collections.ObjectModel.Collection[System.Attribute]]::new()
-        $AttributeCollection.Add( $Attribute )
-
-        $Value = [System.Collections.Generic.List[System.String]]::new()
-        $Value.Add( 'blah1' )
-        $Value.Add( 'blah2' )
-        $Value.Add( 'blah3' )
-
-        $ValidateSet = [System.Management.Automation.ValidateSetAttribute]::new( $Value )
-                
-        $AttributeCollection.Add( $ValidateSet )
-
-        $Parameter = [System.Management.Automation.RuntimeDefinedParameter]::new( 'WellKnownID', [System.String], $AttributeCollection )
-        $ParameterDictionary = [System.Management.Automation.RuntimeDefinedParameterDictionary]::new()
-        $ParameterDictionary.Add( 'WellKnownID', $Parameter )
-
-        Return $ParameterDictionary
-    }  #>
-
     Process
     {
        #region Raw (basic API call)
 
-            If
-            (
-                $WellKnownID
-            )
-            {
-                $Message = "Well-Known ID: $WellKnownID"                
-            }
-            Else
-            {
-                $Message = 'No Well-Known ID was provided'
-            }
-            Write-Verbose -Message $Message
+          # Prepare variable
 
             If
             (
@@ -131,41 +94,17 @@ Get-bcdObject
 
             $MethodParam = @{
         
-                CimInstance = $Store
+                cimInstance = $Store
                 Verbose     = $False
             }
+
+          # Handle different modes
 
             Switch
             (
                 $psCmdlet.ParameterSetName
             )
             {
-                'Type'
-                {
-                    If
-                    (
-                        @( $Type ).Count -eq 1
-                    )
-                    {
-                        $Message = "Enumerating BCD objects of type `“$Type`”"
-                        Write-Debug -Message $Message
-
-                        $Argument = @{
-
-                            'Type' = $Type[0]
-                        }
-
-                        $MethodParam.Add( 'MethodName', 'EnumerateObjects' )
-                    }
-                    Else
-                    {
-                        $Raw = $Type | ForEach-Object -Process {
-
-                            Get-bcdObject -Store $Store -Type $psItem
-                        } #| Sort-Object -Unique -Property 'Id'
-                    }
-                }
-
                 'Id'
                 {
                     If
@@ -173,7 +112,7 @@ Get-bcdObject
                         @( $Id ).Count -eq 1
                     )
                     {
-                        $Message = "Retrieving BCD object with ID `“$Id`”"
+                        $Message = "Retrieving BCD object with ID `{$Id`}"
                         Write-Debug -Message $Message
 
                         $Argument = @{
@@ -192,16 +131,74 @@ Get-bcdObject
                     }
                 }
 
+                'Well-Known'
+                {
+                    $Raw = $WellKnownID | ForEach-Object -Process {
+
+                     <# $WellKnownIdCurrent = $psItem
+
+                        $IdCurrent = $ObjectWellKnown.GetEnumerator() | Where-Object -FilterScript {
+                            $psItem.Value -eq $WellKnownIdCurrent
+                        }  #>
+
+                        $IdCurrent = $ObjectWellKnown[ $psItem ]
+
+                        $Message = [System.String]::Empty
+                        $Message += "Retrieving well-known object `“$psItem`”"
+                      # $Message += " with ID `{$($IdCurrent.Key)`} from Store"
+                        $Message += " with ID `{$IdCurrent`} from Store"
+                        $Message += " `“$($Store.FilePath)`”"
+                        Write-Debug -Message $Message
+
+                        Get-bcdObject -Store $Store -Id $IdCurrent
+                    }
+                }
+
+                'Type'
+                {
+                    If
+                    (
+                        @( $Type ).Count -eq 1
+                    )
+                    {
+                        $Message  = [System.String]::Empty
+                        $Message += "Enumerating BCD objects of type `“$Type`”"
+                        $Message += " in Store `“$($Store.FilePath)`”"
+                        Write-Debug -Message $Message
+
+                        $Argument = @{
+
+                            'Type' = $Type[0]
+                        }
+
+                        $MethodParam.Add( 'MethodName', 'EnumerateObjects' )
+                    }
+                    Else
+                    {
+                        $Raw = $Type | ForEach-Object -Process {
+
+                            Get-bcdObject -Store $Store -Type $psItem
+                        } #| Sort-Object -Unique -Property 'Id'
+                    }
+                }
+
                 'List'
                 {
-                    $Message = "Type or ID were not specified. Listing all BCD objects in store `“$Store`”"
+                    $Message  = [System.String]::Empty
+                    $Message += "Type or ID were not specified. Listing all "
+                    $Message += "BCD objects of known types in store "
+                    $Message += "`“$($Store.FilePath)`”"
                     Write-Debug -Message $Message
 
-                    $Raw = [ObjectType].GetEnumValues() | ForEach-Object -Process {
+                    $Raw =
+                        [ObjectType].GetEnumValues() | ForEach-Object -Process {
 
                         Get-bcdObject -Store $Store -Type $psItem
                     } #| Sort-Object -Unique -Property 'Id'
                 }
+
+             <# The following is indicator that we're running in one of the
+                modes which involve actual query  #>
 
                 {
                     $MethodParam[ 'MethodName' ]
@@ -239,7 +236,16 @@ Get-bcdObject
                     }
                     Else
                     {
-                        Throw
+                        $Message  = [System.String]::Empty
+                        $Message += 'No BCD objects satisfying the criteria'
+                        $Message += ' specified were found in Store'
+                        $Message += " `“$($Store.FilePath)`”"
+                        Write-Warning -Message $Message
+
+                     <# Need to initialize the variable nevertheless for future
+                        processing  #>
+
+                        $Raw = @()
                     }
                 }
 
@@ -289,8 +295,8 @@ Get-bcdObject
                             System.String, System.Object
                         ]]::new()
 
-                        $IdEx.Add( 'Id'        ,  [System.Guid] $ObjectCurrent.Id   )
-                        $IdEx.Add( 'Type'      ,  [ObjectType]  $ObjectCurrent.Type )
+                        $IdEx.Add( 'Id'   , [System.Guid] $ObjectCurrent.Id   )
+                        $IdEx.Add( 'Type' , [ObjectType]  $ObjectCurrent.Type )
                   
                         $ElementParam = @{
 
@@ -298,7 +304,7 @@ Get-bcdObject
                             Expand = $Expand
                             Format = $Format
                         }
-                        $Element = Get-bcdObjectElement @ElementParam
+                        $Element = Get-bcdElement @ElementParam
                     
                         $Expanded.Add( $IdEx, $Element )
                     }
@@ -330,21 +336,29 @@ Get-bcdObject
 
                       # Unique properties which are unique per object
                     
-                        $Formatted = $Expanded.GetEnumerator() | ForEach-Object -Process { 
+                        $Formatted = $Expanded.GetEnumerator() |
+                            ForEach-Object -Process { 
 
                             $ExpandedCurrent = $psItem
 
-                         <# Clone the list of proeperties so that we can append
+                         <# Clone the list of properties so that we can append
                             it with the properties which are specific for the
-                            curren object  #>
+                            current object  #>
 
                             $PropertyCurrent = $Property
 
                          <# A property to specify a well-known object ID, if 
                             applicable  #>
 
-                            $ObjectWellKnownCurrent = $ObjectWellKnown[ $ExpandedCurrent.Key.Id ]
+                          # $ObjectWellKnownCurrent = $ObjectWellKnown[ $ExpandedCurrent.Key.Id ]
 
+                            $ObjectWellKnownCurrent =
+                                $ObjectWellKnown.GetEnumerator() |
+                                    Where-Object -FilterScript {
+
+                                $psItem.Value -eq $ExpandedCurrent.Key.Id
+                            }
+                            
                             If
                             (
                                 $ObjectWellKnownCurrent
@@ -352,14 +366,16 @@ Get-bcdObject
                             {
                                 $PropertyCurrent += @{
 
-                                    Label      = 'Well-Knonw Object'
-                                    Expression = { $ObjectWellKnownCurrent }
+                                    Label      = 'Well-Known Object'
+                                    Expression = {
+                                        $ObjectWellKnownCurrent.key -join ','
+                                    }
                                 }
                             }
     
                          <# Each element gets added as a property, but only for
                             existing elements. We cannot build universal list of
-                            properties which applis for all objects because they
+                            properties which applies for all objects because they
                             will have different elements. Hence each object gets
                             processed individually  #>
 
@@ -367,29 +383,54 @@ Get-bcdObject
 
                                 [System.String]$Label = $psItem.Type
 
-                                $StringBuilder = [System.Text.StringBuilder]::New()
-
                              <# Building “Expression” for property value. This
                                 is a little tricky because we need to expand the
-                               “Label” variable into actualy property name, but
+                               “Label” variable into actual property name, but
                                 keep the rest of the variables as raw text.
                                (They will be expanded at the time when
                                 expression runs)
                               #>
 
-                                [System.Void]( $StringBuilder.Append( '$ValueCurrent =  $psItem.Value | Where-Object -FilterScript {' ) )
+                             <# $StringBuilder =
+                                    [System.Text.StringBuilder]::New()
+                                
+                                [System.Void]( $StringBuilder.Append(
+                                    '$ValueCurrent =  $psItem.Value |'
+                                ))
+                                [System.Void]( $StringBuilder.Append(
+                                    ' Where-Object -FilterScript {'
+                                ))
                                 [System.Void]( $StringBuilder.Append( "`n" ))
-                                [System.Void]( $StringBuilder.Append( '    $psItem.Type -eq ''' ))
-                                [System.Void]( $StringBuilder.Append( $Label ) )
-                                [System.Void]( $StringBuilder.Append( "'`n" ))
-                                [System.Void]( $StringBuilder.Append( "}`n" ))
-                                [System.Void]( $StringBuilder.Append( "`n" ))
+                                [System.Void]( $StringBuilder.Append(
+                                    '    $psItem.Type -eq '''
+                                ))
+                                [System.Void]( $StringBuilder.Append( $Label ))
+                                [System.Void]( $StringBuilder.Append( "'`n"  ))
+                                [System.Void]( $StringBuilder.Append( "}`n"  ))
+                                [System.Void]( $StringBuilder.Append( "`n"   ))
                                 [System.Void]( $StringBuilder.Append( '$ValueCurrent.Value' ))
                             
-                                $ScriptBlock = [System.Management.Automation.ScriptBlock]::Create( 
+                                $ScriptBlock =
+                                    [System.Management.Automation.ScriptBlock]::Create( 
                             
-                                    $StringBuilder.ToString()
-                                )
+                                        $StringBuilder.ToString()
+                                    )  #>
+
+                                $Expression  = [System.String]::Empty
+                                $Expression += '$ValueCurrent =  $psItem.Value |'
+                                $Expression += ' Where-Object -FilterScript {'
+                                $Expression += "`n"
+                                $Expression += '    $psItem.Type -eq '''
+                                $Expression += $Label
+                                $Expression += "'`n"
+                                $Expression += "}`n"
+                                $Expression += "`n"
+                                $Expression += '$ValueCurrent.Value'
+                            
+                                $ScriptBlock =
+                                    [System.Management.Automation.ScriptBlock]::Create(                            
+                                        $Expression
+                                    )
 
                                 $PropertyCurrent += @{
 
@@ -398,7 +439,8 @@ Get-bcdObject
                                 }                            
                             }
 
-                            $ExpandedCurrent | Select-Object -Property $PropertyCurrent
+                            $ExpandedCurrent |
+                                Select-Object -Property $PropertyCurrent
                         }
 
                    #endregion Format
@@ -412,14 +454,15 @@ Get-bcdObject
             }
             Else
             {
-                $Message = "Returning $($Raw.count) objects"
+                $Message = "Returning $(@($Raw).count) objects"
                 
                 If
                 (
                     $Raw
                 )
                 {
-                    $Message += " of type $([ObjectType[]]$Raw.Type | Sort-Object -Unique)"
+                    [ObjectType[]]$TypeCurrent = $Raw.Type | Sort-Object -Unique
+                    $Message += " of type $TypeCurrent"
                 }
                 Write-Debug -Message $Message
 

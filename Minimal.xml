@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <!--  Sample Answer file to automate minimal viable manageable configuration
+          Last edit 2020-03-03 by Artem Pronichkin
+          For explanation please see https://pronichkin.com -->
+    <unattend xmlns="urn:schemas-microsoft-com:unattend">
+      <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup"
+                   processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35"
+                   language="neutral" versionScope="nonSxS"
+                   xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <ComputerName>ArtemP-HCI-01</ComputerName>
+        </component>
+        <!--  You must provide credentials to join a domain  -->
+        <!--  If you do not join machine to the domain here (i.e. join a workgroup),
+              consider adding known (not necessarily trusted by default) certificate
+              for RDP and/or WinRM. (Use custom script to configure it, e.g. called 
+              from SetupComplete.cmd. See “New-ShieldingDataAnswerFile” function for
+              examples.) Otherwise, you cannot ensure you are initially connecting 
+              to the machine you expect. This means your configuration is ultimately
+              untrusted  -->
+        <component name="Microsoft-Windows-UnattendedJoin" 
+                   processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+                   language="neutral" versionScope="nonSxS" 
+                   xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Identification>
+            <Credentials>
+              <Domain>ntdev.corp.microsoft.com</Domain>
+              <Username>artemp@ntdev.corp.microsoft.com</Username>
+              <Password>redacted</Password>
+            </Credentials>
+            <JoinDomain>ntdev.corp.microsoft.com</JoinDomain>
+          </Identification>
+        </component>
+      </settings>
+      <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup" 
+                   processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" 
+                   language="neutral" versionScope="nonSxS" 
+                   xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" 
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <!--  You can add extra user accounts here  -->
+          <UserAccounts>
+      <!--  You do not have to provide password for local Administrator
+            or otherwise specify this section. If you leave it commented,
+            Administrator account would have empty (blank) password.
+            That means the account cannot be used remotely.
+            (Note that local console connections are not available
+            for Shielded VMs.)  -->
+       <!-- <AdministratorPassword>
+              <Value>redacted</Value>
+              <PlainText>false</PlainText>
+            </AdministratorPassword>  -->
+            <DomainAccounts>
+              <DomainAccountList wcm:action="add">
+                <DomainAccount wcm:action="add">
+                  <Name>artemp</Name>
+                  <Group>Administrators</Group>
+                </DomainAccount>
+                <!--  It's important to use flat (NetBIOS-style) domain name here,
+                      not a FQDN  -->
+                <Domain>ntdev</Domain>
+              </DomainAccountList>
+            </DomainAccounts>        
+          </UserAccounts>
+        </component>
+      </settings>
+    </unattend>

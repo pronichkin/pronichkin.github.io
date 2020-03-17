@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\OEM branding sample",
+    "\\psbcd",
+    "\\psbcd\\1.0.2020.220",
     "\\Server Configuration Sample"
   ],
-  "SelectedNode": "\\Server Configuration Sample\\08 — Network.ps1",
+  "SelectedNode": "\\Server Configuration Sample\\Build USB media.ps1",
   "PreviewInSolutionExplorer": false
 }

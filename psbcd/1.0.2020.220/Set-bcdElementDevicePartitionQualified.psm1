@@ -2,7 +2,7 @@
 using module '.\Flag.psm1'
 
 Function
-Set-bcdObjectElementDevicePartitionQualified
+Set-bcdElementDevicePartitionQualified
 {
     [CmdletBinding()]
 
@@ -68,7 +68,7 @@ Set-bcdObjectElementDevicePartitionQualified
                 Type   = $Type
                 Flag   = [Flag]::Qualified
             }
-            $Element = Get-bcdObjectElement @ElementParam
+            $Element = Get-bcdElement @ElementParam
 
             Return $Element
         }

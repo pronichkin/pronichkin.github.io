@@ -7,12 +7,12 @@ Using Module '.\DeviceType.psm1'
     Note
 
     Formatted output is not intended for programmatic use (e.g. consumption
-    from pipeline or variables.) “Get-bcdObjectElement” provides raw output 
+    from pipeline or variables.) “Get-bcdElement” provides raw output 
     which is more suitable for these scenarios
 #>
 
 Function
-Get-bcdObjectElementAdditionalOption
+Get-bcdElementAdditionalOption
 {
     [CmdletBinding()]
 

@@ -3,7 +3,7 @@ Using Module '.\Flag.psm1'
 Using Module '.\DeviceType.psm1'
 
 Function
-Get-bcdObjectElement
+Get-bcdElement
 {
     [CmdletBinding()]
 
@@ -198,6 +198,7 @@ Get-bcdObjectElement
                         $TypeEx.Add( 'Type'    ,  [ElementType]   $ElementCurrent.Type                  )
                         $TypeEx.Add( 'Format'  ,  [System.String] $ElementCurrent.CimClass.CimClassName )
 
+                      # Different handling depending on Element format
                       # https://docs.microsoft.com/en-us/previous-versions/windows/desktop/bcd/bcd-classes
 
                         Switch
@@ -218,7 +219,7 @@ Get-bcdObjectElement
                                     Expand  = $Expand
                                     Format  = $Format
                                 }
-                                $Value = Get-bcdObjectElementDevice @ElementParam
+                                $Value = Get-bcdElementDevice @ElementParam
                             }
 
                             'BcdObjectListElement'

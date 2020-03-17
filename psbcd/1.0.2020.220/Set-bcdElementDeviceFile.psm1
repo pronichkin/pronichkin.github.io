@@ -3,7 +3,7 @@ using module '.\Flag.psm1'
 using module '.\DeviceType.psm1'
 
 Function
-Set-bcdObjectElementDeviceFile
+Set-bcdElementDeviceFile
 {
     [CmdletBinding()]
 
@@ -111,7 +111,7 @@ Set-bcdObjectElementDeviceFile
                 Object = $Object
                 Type   = $Type
             }
-            $Element = Get-bcdObjectElement @ElementParam
+            $Element = Get-bcdElement @ElementParam
 
             Return $Element
         }
