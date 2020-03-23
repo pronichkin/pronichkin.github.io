@@ -54,6 +54,8 @@ If
     (Exception from HRESULT: 0x80010002 (RPC_E_CALL_CANCELED))”
     
     in case computer was never restarted yet
+
+    Additionally, without “-Force” it fails with “The parameter is incorrect.”
   #>
 
     Restart-Computer -ComputerName $Restart.psComputerName -Wait -Protocol WSMan -Force

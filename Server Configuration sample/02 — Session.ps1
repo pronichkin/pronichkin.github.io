@@ -22,12 +22,20 @@ $psSession  = [System.Collections.Generic.List[
     $Name.Add( 'Kepler' + $psItem.ToString( 'D3' ) )
 }  #>
 
-1..2 | ForEach-Object -Process {
+<# 1..2 | ForEach-Object -Process {
     $Name.Add( 'ArtemP-HCI-' + $psItem.ToString( 'D2' ) )
-}
+}  #>
 
-# $Name.Add( 'ArtemP-hvs01c' )
-# $Name.Add( 'ArtemP-hvs02f' )
+  # $Name.Add( 'ArtemP-hvs01c' )
+  # $Name.Add( 'ArtemP-hvs02f' )
+
+  # $Name.Add( 'ArtemP-rs5ru' )
+  # $Name.Add( 'ArtemP-rs5fr' )
+  # $Name.Add( 'ArtemP-rs5de' )
+    $Name.Add( 'ArtemP-rs5it' )
+    $Name.Add( 'ArtemP-rs5es1' )
+    $Name.Add( 'ArtemP-rs5cn' )
+    $Name.Add( 'ArtemP-rs5ja' )
 
 $Name | ForEach-Object -Process {
     Resolve-DnsName -Name $psItem -Verbose:$False -Debug:$False | ForEach-Object -Process { 

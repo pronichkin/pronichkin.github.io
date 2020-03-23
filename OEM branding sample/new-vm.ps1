@@ -1,7 +1,23 @@
-  $Name      = 'Proseware HCI'
-  $Path      = 'D:\Virtual Machine'
-# $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVERHYPERCORE_OEM_x64FRE_en-us_1.iso'
-  $ImagePath = 'D:\Image\SW_DVD9_Win_Server_STD_CORE_2019_1809.2_64Bit_English_DC_STD_MLF_X22-18452.ISO'
+  # $Name      = 'Proseware HCI'
+  # $Name      = 'ArtemP-RS5ru'
+  # $Name      = 'ArtemP-RS5fr'
+  # $Name      = 'ArtemP-RS5de'
+  # $Name      = 'ArtemP-RS5it'
+  # $Name      = 'ArtemP-RS5es'
+  # $Name      = 'ArtemP-RS5cn'
+    $Name      = 'ArtemP-RS5ja'
+
+  # $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVERHYPERCORE_OEM_x64FRE_en-us_1.iso'
+  # $ImagePath = 'D:\Image\SW_DVD9_Win_Server_STD_CORE_2019_1809.2_64Bit_English_DC_STD_MLF_X22-18452.ISO'
+  # $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_ru-ru_1.iso'
+  # $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_fr-fr_1.iso'
+  # $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_de-de_1.iso'
+  # $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_it-it_1.iso'
+  # $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_es-es_1.iso'
+  # $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_zh-cn_1.iso'
+    $ImagePath = 'D:\Image\17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_ja-jp_1.iso'
+
+    $Path      = 'D:\Virtual Machine'
 
 $vm = Get-vm | Where-Object -FilterScript {
     $psItem.Name -eq $Name
@@ -41,7 +57,7 @@ Else
 }
 
 Set-vmProcessor -vm $vm -Count 4
-Set-vmMemory    -vm $vm -DynamicMemoryEnabled $True -MaximumBytes 8gb -StartupBytes 2gb
+Set-vmMemory    -vm $vm -DynamicMemoryEnabled $True -MaximumBytes 8gb -StartupBytes 1gb
 Set-vmFirmware  -vm $vm -ConsoleMode None -PauseAfterBootFailure On -FirstBootDevice $Drive
 Set-vm -vm $vm -LockOnDisconnect On -CheckpointType Disabled -BatteryPassthroughEnabled $True -AutomaticCheckpointsEnabled $False
 
