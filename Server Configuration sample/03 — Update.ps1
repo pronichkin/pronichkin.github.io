@@ -16,7 +16,7 @@
     {
         Write-Verbose -Message "$((Get-Date).ToUniversalTime().ToLongTimeString())    Updates found on $($env:ComputerName)"
 
-        $Update | ForEach-Object -Process {
+        $Update | Sort-Object -Property 'Title' | ForEach-Object -Process {
             Write-Debug -Message "    * $( $psItem.Title )"
         }
 

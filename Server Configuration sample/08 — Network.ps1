@@ -1,4 +1,4 @@
-﻿#region Data
+﻿    #region Data
 
     $Subnet = [System.Collections.Generic.List[System.Net.ipAddress]]::new()
     $Subnet.Add( '192.168.0.0' )
@@ -86,71 +86,93 @@
         {
           # Select the first suitable subnet
 
-            $SubnetCurrentMark   = $SubnetUnique | Select-Object -First 1
-            $SubnetCurrent       = Get-netIpSubnet -ipAddress $SubnetCurrentMark -PrefixLength $PrefixLength
-            $SubnetCurrentInt    = ConvertFrom-netIpAddress -ipAddress $SubnetCurrent
-            $SubnetBroadcast     = Get-netIpSubnetBroadcastAddress -ipAddress $SubnetCurrent -PrefixLength $PrefixLength
-
-            $Message = "  Testing subnet  $SubnetCurrent"
-            Write-Verbose -Message $Message
-
-            $Index = $Subnet.IndexOf( $SubnetCurrentMark )
-
-          # Increment the current subnet address to get the next IP address
-
-            $ipAddressCurrent = [System.Net.ipAddress]::Parse( ( ConvertFrom-netIpAddress -ipAddress $SubnetCurrentMark ) + 1 )
-        
             If
             (
-                $ipAddressCurrent -eq $SubnetBroadcast
+                $SubnetUnique
             )
             {
-                $Message = "Subnet is exhausted, skipping"
+                $SubnetCurrentMark   = $SubnetUnique | Select-Object -First 1
+                $SubnetCurrent       = Get-netIpSubnet -ipAddress $SubnetCurrentMark -PrefixLength $PrefixLength
+                $SubnetCurrentInt    = ConvertFrom-netIpAddress -ipAddress $SubnetCurrent
+                $SubnetBroadcast     = Get-netIpSubnetBroadcastAddress -ipAddress $SubnetCurrent -PrefixLength $PrefixLength
+
+                $Message = "  Testing subnet  $SubnetCurrent"
                 Write-Verbose -Message $Message
-                       
-                $Test = $False
-            }
-            Else
-            {
-                $Message = "  Testing address $ipAddressCurrent"
-                Write-Verbose -Message $Message
+
+                $Index = $Subnet.IndexOf( $SubnetCurrentMark )
+
+              # Increment the current subnet address to get the next IP address
+
+                $ipAddressCurrent = [System.Net.ipAddress]::Parse( ( ConvertFrom-netIpAddress -ipAddress $SubnetCurrentMark ) + 1 )
         
-                $AssignCurrent = New-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -PrefixLength $PrefixLength -Debug:$False | Where-Object -FilterScript {
-        
-                    $psItem.Store -eq [Microsoft.PowerShell.Cmdletization.GeneratedTypes.netIpAddress.Store]::ActiveStore
-                }
-
-                While
-                (
-                    $AssignCurrent.AddressState -ne [Microsoft.PowerShell.Cmdletization.GeneratedTypes.netIpAddress.AddressState]::Preferred
-                )
-                {
-                    $AssignCurrent = Get-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Debug:$False
-
-                    $Message = '      Waiting for the address to come online'
-                    Write-Debug -Message $Message
-                    Start-Sleep -Seconds 3
-                }
-
-                $ipAddressCurrentInt = ConvertFrom-netIpAddress -ipAddress $ipAddressCurrent
-
                 If
                 (
-                    $ipAddressCurrentInt -eq $SubnetCurrentInt + 1
+                    $ipAddressCurrent -eq $SubnetBroadcast
                 )
                 {
-                  # This is the first IP address in subnet, so do not perform connectivity test
-
-                    $Test = $True
+                    $Message = "Subnet is exhausted, skipping"
+                    Write-Verbose -Message $Message
+                       
+                    $Test = $False
                 }
                 Else
                 {
-                    $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
-            
-                        Test-NetConnection -ComputerName $using:SubnetCurrentMark -WarningAction SilentlyContinue
+                    $Message = "  Testing address $ipAddressCurrent"
+                    Write-Verbose -Message $Message
+        
+                    $AssignCurrent = New-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -PrefixLength $PrefixLength -Debug:$False | Where-Object -FilterScript {
+        
+                        $psItem.Store -eq [Microsoft.PowerShell.Cmdletization.GeneratedTypes.netIpAddress.Store]::ActiveStore
                     }
 
-                    $Test = $Command.PingSucceeded
+                    While
+                    (
+                        $AssignCurrent.AddressState -ne [Microsoft.PowerShell.Cmdletization.GeneratedTypes.netIpAddress.AddressState]::Preferred
+                    )
+                    {
+                        $AssignCurrent = Get-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Debug:$False
+
+                        $Message = '      Waiting for the address to come online'
+                        Write-Debug -Message $Message
+                        Start-Sleep -Seconds 3
+                    }
+
+                    $ipAddressCurrentInt = ConvertFrom-netIpAddress -ipAddress $ipAddressCurrent
+
+                    If
+                    (
+                        $ipAddressCurrentInt -eq $SubnetCurrentInt + 1
+                    )
+                    {
+                      # This is the first IP address in subnet, so do not perform connectivity test
+
+                        $Test = $True
+                    }
+                    Else
+                    {
+                        $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
+            
+                            Test-NetConnection -ComputerName $using:SubnetCurrentMark -WarningAction SilentlyContinue
+                        }
+
+                        $Test = $Command.PingSucceeded
+                    }
+
+                    If
+                    (
+                        $Test
+                    )
+                    {
+                        Write-Verbose -Message 'Success'
+                    }
+                    Else
+                    {
+                        Write-Verbose -Message 'Fail, trying next subnet'
+
+                        [System.Void](
+                            Remove-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Confirm:$False -Debug:$False
+                        )
+                    }
                 }
 
                 If
@@ -158,30 +180,19 @@
                     $Test
                 )
                 {
-                    Write-Verbose -Message 'Success'
+                    $Assign.Add( $AssignCurrent )
                 }
                 Else
                 {
-                    Write-Verbose -Message 'Fail, trying next subnet'
+                  # Iterate through the list of suitable subnets so that the next one is tried on the next loop
 
-                    [System.Void](
-                        Remove-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Confirm:$False -Debug:$False
-                    )
+                    $SubnetUnique = $SubnetUnique | Where-Object -FilterScript { $psItem -ne $SubnetCurrentMark }
                 }
-            }
-
-            If
-            (
-                $Test
-            )
-            {
-                $Assign.Add( $AssignCurrent )
             }
             Else
             {
-              # Iterate through the list of suitable subnets so that the next one is tried on the next loop
-
-                $SubnetUnique = $SubnetUnique | Where-Object -FilterScript { $psItem -ne $SubnetCurrentMark }
+                $Message = 'There are no more subnets. Process will fail'
+                Throw $Message
             }
         }
 

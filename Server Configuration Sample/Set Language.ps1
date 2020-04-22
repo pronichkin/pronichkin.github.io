@@ -1,10 +1,10 @@
 ﻿#region Variable
 
-    $ComputerName = 'ArtemP-rs5ja.ntdev.corp.microsoft.com'
+    $ComputerName = 'ArtemP-rs5en01.ntdev.corp.microsoft.com'
     $SourcePath   = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE\17763.1.180914-1434\amd64fre\iso\iso_Server_langpacks\17763.1.180914-1434.rs5_release_SERVERLANGPACKDVD_OEM_MULTI.iso'
 
-    $Language = 'en-us'
-    $Region   = 'us'
+    $Language = 'fr-fr'
+    $Region   = 'fr'
     $TimeZone = 'Pacific Standard Time'
 
 #endregion Variable
@@ -64,7 +64,7 @@
  <# Based on documentation, the following two settings should have followed the
    “Language List” defined above.
  
- 1. Culture (aka regional format settings aka user local.) It is supposed to
+ 1. Culture (aka regional format settings aka user locale.) It is supposed to
     follow the “Language List” unless “WinCultureFromLanguageListOptOut” is set.
  
     Note
@@ -79,7 +79,7 @@
  2. Windows user interface language. It is also supposed to dynamically follow 
     the “Language List” unless “WinUILanguageOverride” is set.
 
-    Apparently, neiver of the above is happening, and these settings are stick
+    Apparently, neither of the above is happening, and these settings are stick
     forever to their original values. (Both per the observed actual behavior,
     as well as reported by Intl.cpl.)
 

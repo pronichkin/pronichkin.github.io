@@ -2,10 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\OEM branding sample",
-    "\\psbcd",
-    "\\psbcd\\1.0.2020.220",
     "\\Server Configuration Sample"
   ],
-  "SelectedNode": "\\OEM branding sample\\new-vm.ps1",
+  "SelectedNode": "\\Server Configuration Sample\\New-vm.ps1",
   "PreviewInSolutionExplorer": false
 }
