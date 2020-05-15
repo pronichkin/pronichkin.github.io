@@ -18,7 +18,7 @@ $psSession  = [System.Collections.Generic.List[
     System.Management.Automation.Runspaces.psSession
 ]]::new()
 
-1..3 | ForEach-Object -Process {
+4..5 | ForEach-Object -Process {
     $Name.Add( 'Kepler' + $psItem.ToString( 'D3' ) )
 }
 
