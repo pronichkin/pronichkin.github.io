@@ -6,6 +6,8 @@
 
     $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1048.200616-1043\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1048.amd64fre.rs5_release_svc_hci.200616-1043_server_serverazurestackhcicor_en-us.vhdx'
 
+    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1015.200511-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1015.amd64fre.rs5_release_svc_hci.200511-1900_server_serverazurestackhcicor_en-us.vhdx'
+
     $DomainName       = 'ntDev.corp.Microsoft.com'
     $Password         = 'P@ssw0rd.123'
   # $MemberName       = 'KeplerLabUser'
