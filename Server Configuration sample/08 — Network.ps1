@@ -3,7 +3,7 @@
     $Subnet = [System.Collections.Generic.List[System.Net.ipAddress]]::new()
     $Subnet.Add( '192.168.0.0' )
     $Subnet.Add( '192.168.0.4' )
-    $Subnet.Add( '192.168.0.8' )
+  # $Subnet.Add( '192.168.0.8' )
 
     $PrefixLength = 30
 

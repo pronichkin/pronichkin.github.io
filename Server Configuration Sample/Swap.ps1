@@ -405,7 +405,7 @@ $psSession | ForEach-Object -Process {
 
             Set-Location -Path $using:Temp
 
-            Expand-Archive -Path ".\$($using:Name).zip"
+            Expand-Archive -Path ".\$($using:Name).zip" -Force
 
             pnputil.exe /Add-Driver ".\$($using:Name)\*.inf" /Install
         }
