@@ -1,0 +1,11 @@
+bin
+obj
+.vs
+
+*.suo
+*.sdf
+*.userprefs
+*.user
+*.tmp
+*.cache
+*.binlog
