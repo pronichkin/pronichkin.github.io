@@ -22,3 +22,18 @@ Invoke-Command -Session $psSession -ScriptBlock {
 
     Get-LocalGroupMember -Group 'Administrators'
 }
+
+$Witness = Set-ClusterQuorum -InputObject $Cluster -FileShareWitness '\\artemp20w.ntdev.corp.microsoft.com\Witness$'
+
+$vmHostParam = @{
+
+    CimSession                                = $cimSession
+    EnableEnhancedSessionMode                 = $True
+    NumaSpanningEnabled                       = $False
+    VirtualMachineMigrationAuthenticationType =
+        [Microsoft.HyperV.PowerShell.MigrationAuthenticationType]::Kerberos
+    VirtualMachineMigrationPerformanceOption  =
+        [Microsoft.HyperV.PowerShell.vmMigrationPerformance]::SMB
+    Passthru                                  = $True
+}
+$vmHost = Set-vmHost @vmHostParam

@@ -1,10 +1,12 @@
 #region Data
 
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17784.1004.200414-2230\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1004.amd64fre.rs5_release_svc_hci_prod1.200414-2230_server_serverazurestackhcicor_en-us.vhdx'
+ <# $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17784.1004.200414-2230\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1004.amd64fre.rs5_release_svc_hci_prod1.200414-2230_server_serverazurestackhcicor_en-us.vhdx'
 
     $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17763.1098.200409-1700\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17763.1098.amd64fre.rs5_release_svc_hci_prod1.200409-1700_server_serverazurestackhcicor_en-us.vhdx'
 
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1015.200511-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1015.amd64fre.rs5_release_svc_hci.200511-1900_server_serverazurestackhcicor_en-us.vhdx'
+    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1015.200511-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1015.amd64fre.rs5_release_svc_hci.200511-1900_server_serverazurestackhcicor_en-us.vhdx'  #>
+
+    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1048.200616-1043\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1048.amd64fre.rs5_release_svc_hci.200616-1043_server_serverazurestackhcicor_en-us.vhdx'
 
     $DomainName       = 'ntDev.corp.Microsoft.com'
     $Password         = 'P@ssw0rd.123'
@@ -403,7 +405,7 @@ $psSession | ForEach-Object -Process {
 
             Set-Location -Path $using:Temp
 
-            Expand-Archive -Path ".\$($using:Name).zip"
+            Expand-Archive -Path ".\$($using:Name).zip" -Force
 
             pnputil.exe /Add-Driver ".\$($using:Name)\*.inf" /Install
         }
