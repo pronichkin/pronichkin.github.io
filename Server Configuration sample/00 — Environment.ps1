@@ -292,3 +292,71 @@ Test-netIpAddress
         }
     }
 }
+
+Function
+Write-Message
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+    Param(
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory = $True
+        )]
+        [System.Management.Automation.ValidateSetAttribute(
+            'Information',
+            'Verbose',
+            'Debug'
+        )]
+        [System.String]
+        $Channel
+    ,
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory = $True
+        )]
+        [System.String]
+        $Message
+    ,
+        [System.Management.Automation.ParameterAttribute()]
+        [System.Int16]
+        $Indent  = 0
+    )
+
+    Process
+    {
+      # Base offset to visually distinguish timestamp from the message
+        $Indent++
+        
+        Switch
+        (
+            $Channel
+        )
+        {
+           'Information'
+            {
+                $Length = 20
+            }
+
+           'Verbose'
+            {
+                $Length = 11
+            }
+
+           'Debug'
+            {
+                $Length = 13
+                $Indent++
+            }
+        }
+
+        $DisplayHint = [Microsoft.PowerShell.Commands.DisplayHintType]::Time
+        $TimeStamp   = ( Get-Date -DisplayHint $DisplayHint ).DateTime
+
+        $MessageEx   = [System.String]::Empty
+        $MessageEx  += $TimeStamp.PadLeft(  $Length )
+        $MessageEx   = $MessageEx.PadRight( $Length + 2 * $Indent )
+        $MessageEx  += $Message
+
+        $Command     = "Write-$Channel"
+
+      & $Command -Message $MessageEx
+    }
+}

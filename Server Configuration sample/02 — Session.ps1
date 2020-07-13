@@ -18,9 +18,9 @@ $psSession  = [System.Collections.Generic.List[
     System.Management.Automation.Runspaces.psSession
 ]]::new()
 
-4..5 | ForEach-Object -Process {
+<# 4..5 | ForEach-Object -Process {
     $Name.Add( 'Kepler' + $psItem.ToString( 'D3' ) )
-}
+}  #>
 
 <# 1..2 | ForEach-Object -Process {
     $Name.Add( 'ArtemP-HCI-' + $psItem.ToString( 'D2' ) )
@@ -57,6 +57,11 @@ $psSession  = [System.Collections.Generic.List[
 
   # $Name.Add( 'Kepler003' )
 
+  # $Name.Add( 'ArtemP-HCI-03' )
+  # $Name.Add( 'ArtemP-HCI-05' )
+    $Name.Add( 'ArtemP-HCI-06' )
+    $Name.Add( 'ArtemP-HCI-07' )
+
 $Name | ForEach-Object -Process {
     Resolve-DnsName -Name $psItem -Verbose:$False -Debug:$False | ForEach-Object -Process { 
         $Record.Add( $psItem )
@@ -68,9 +73,6 @@ $Record | Where-Object -FilterScript {
 } | Sort-Object -Unique -Property 'Name' | ForEach-Object -Process {
     $Address.Add( $psItem.Name )
 }
-
-
-
 
 $Address | ForEach-Object -Process {
 
