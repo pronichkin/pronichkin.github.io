@@ -5,7 +5,8 @@
     'FailoverClusters',
     'dism',
     'NetSecurity',
-    'Storage'
+    'Storage',
+    'Hyper-V'
 )
 
 $VerbosePreference     = 'Continue'
