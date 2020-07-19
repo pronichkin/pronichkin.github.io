@@ -1,4 +1,6 @@
-﻿$Name       = [System.Collections.Generic.List[
+﻿$Credential = Get-Credential
+
+$Name       = [System.Collections.Generic.List[
     System.String
 ]]::new()
 
@@ -72,8 +74,9 @@ $psSession  = [System.Collections.Generic.List[
   # $Name.Add( 'ArtemP-HCI-35'  )
   # $Name.Add( 'ArtemP-HCI-36'  )
   # $Name.Add( 'ArtemP-HCI-37'  )
-    $Name.Add( 'ArtemP-HCI-44'  )
-    $Name.Add( 'ArtemP-HCI-45'  )
+  # $Name.Add( 'ArtemP-HCI-44'  )
+  # $Name.Add( 'ArtemP-HCI-45'  )
+    $Name.Add( 'ArtemP27s'      )
 
 $Name | ForEach-Object -Process {
     Resolve-DnsName -Name $psItem -Verbose:$False -Debug:$False | ForEach-Object -Process { 
@@ -104,8 +107,56 @@ $Address | ForEach-Object -Process {
         $Test.TcpTestSucceeded
     )
     {
-        $cimSession.Add( ( New-cimSession -ComputerName $psItem -Verbose:$False ) )
-        $psSession.Add(  ( New-psSession  -ComputerName $psItem ) )
+        $SessionParam = @{
+
+            ComputerName = $psItem
+            Verbose      = $False
+        }
+
+        If
+        (
+            Test-Path -Path 'Variable:\Credential'
+        )
+        {
+            $Message = 'Explicit credentials were specified'
+            Write-Message -Channel Debug -Message $Message
+
+            $ItemPath = 'wsMan:\Localhost\Client\TrustedHosts'
+
+            $Item = Get-Item -Path $ItemPath
+
+            If
+            (
+                $Item.Value -and
+                $Item.Value -split ',' -contains $Address[0]
+            )
+            {
+                $Message = "`“$($Address[0])`” is already a trusted host"
+                Write-Message -Channel Debug -Message $Message
+            }
+            Else
+            {
+                $Message = "Adding `“$($Address[0])`” to trusted hosts"
+                Write-Message -Channel Debug -Message $Message
+
+                $Item = Set-Item -Path $ItemPath -Value $Address[0] -Concatenate -Force -PassThru
+            }
+
+            $SessionParam.Add(
+                'Credential',
+                $Credential
+            )
+
+            $SessionParam.Add(
+                'Authentication',
+                [Microsoft.Management.Infrastructure.Options.PasswordAuthenticationMechanism]::Negotiate
+            )
+        }
+
+
+
+        $cimSession.Add( ( New-cimSession @SessionParam ) )
+        $psSession.Add(  ( New-psSession  @SessionParam ) )
     }
     Else
     {

@@ -1,9 +1,14 @@
 {
   "ExpandedNodes": [
     "",
+    "\\DatacenterAdvancedAutomation.Process",
+    "\\DatacenterAdvancedAutomation.Process\\1.0.2020.105",
+    "\\DatacenterAdvancedAutomation.Utility",
+    "\\DatacenterAdvancedAutomation\\1.0.2019.1227",
+    "\\DismEx",
+    "\\DismEx\\1.0.2019.1227",
     "\\OEM branding sample",
     "\\Server Configuration Sample"
   ],
-  "SelectedNode": "\\Server Configuration Sample\\New-vm.ps1",
   "PreviewInSolutionExplorer": false
 }
