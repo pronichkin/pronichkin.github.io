@@ -29,7 +29,8 @@
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1066.200714-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_fr-fr\17784.1066.amd64fre.rs5_release_svc_hci.200714-1900_server_serverazurestackhcicor_fr-fr.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1067.200715-1945\amd64fre\vhdx\vhdx_server_azurecore_en-us\17784.1067.amd64fre.rs5_release_svc_hci.200715-1945_server_serverturbinecore_en-us.vhdx'
   # $SourcePath = 'C:\Users\artemp\17784.1067.amd64fre.rs5_release_svc_hci.200715-1945_Server_ServerTurbineCorCore_en-US.vhdx'
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_en-us.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_en-us.vhdx'
+    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_ru-ru\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_ru-ru.vhdx'
 
     $Name             = 'ArtemP-HCI'
   # $Start            =  23

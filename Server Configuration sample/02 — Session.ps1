@@ -1,4 +1,4 @@
-﻿$Credential = Get-Credential
+﻿  # $Credential = Get-Credential
 
 $Name       = [System.Collections.Generic.List[
     System.String
@@ -76,7 +76,11 @@ $psSession  = [System.Collections.Generic.List[
   # $Name.Add( 'ArtemP-HCI-37'  )
   # $Name.Add( 'ArtemP-HCI-44'  )
   # $Name.Add( 'ArtemP-HCI-45'  )
-    $Name.Add( 'ArtemP27s'      )
+  # $Name.Add( 'ArtemP27s'      )
+    $Name.Add( 'ArtemP-HCI-50'  )
+    $Name.Add( 'ArtemP-HCI-51'  )
+
+Clear-DnsClientCache
 
 $Name | ForEach-Object -Process {
     Resolve-DnsName -Name $psItem -Verbose:$False -Debug:$False | ForEach-Object -Process { 
