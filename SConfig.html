@@ -4,11 +4,10 @@
         <title>
             Server Configuration utility (SConfig) in Azure Stack HCI and beyond
         </title>
-        <style>
-            * {
-                font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
-            }
-        </style>
+        <link
+            rel="stylesheet"
+            href="Style.css"
+        />
     </head>
     <body>
         <h1 id="top">
@@ -146,7 +145,7 @@
                     </li>
                     <li>
                         <a href="#QnA">
-                            Something else does not work for you?
+                            Something else does not quite work for you?
                         </a>
                     </li>
                 </ul>
@@ -159,7 +158,7 @@
         </ul>
 
         <h2 id="History">
-            A brief (yes, brief) history of Server Core manageability
+            A brief <em>(yes, brief)</em> history of Server Core manageability
         </h2>
         <p>
             You may be new to Server Core, and I will forgive you. Server Core 
@@ -232,12 +231,13 @@
             Remote Desktop</a>, but also exposed some very niche  settings like
             IPsec or DNS SRV record configuration for domain controllers. Heck,
             it even came with a built-in list of other helpful commands! Try this:
+        </p>
 
-            <blockquote style="background-color:blue; color: white; font-family:
-                Consolas,monaco,monospace; padding:15px">
-
+        <p class="code">
             CScript.exe /noLogo C:\Windows\System32\SCregEdit.wsf /cli
-            </blockquote>
+        </p>
+        
+        <p>
             Hey, don't look at me like that&mdash;remember, it was before Internet
             became available on every phone in every corner of the planet. And even
             before PowerShell got installed by default everywhere, so that you
@@ -254,7 +254,10 @@
             and no mouse-friendly menus. It was a classic console app with
             input-driven menu. E.g. you had to type <strong>1</strong> to enter
             domain join command, or type <strong>2</strong> to rename computer, 
-            and so on.
+            and so on. (If you are unfamiliar with SConfig and would like to
+            learn more,
+            <a href="https://docs.microsoft.com/windows-server/get-started/sconfig-on-ws2016">here's
+            a decent document</a> written at Windows Server 2016 times.)
         </p>
         <p>
             SConfig tremendously helped performing initial server configuration
@@ -328,7 +331,7 @@
             exists today in Windows Server.
         </p>        
 
-        <table style="margin-left: auto; margin-right: auto;">
+        <table class="center" >
             <caption>Comparing two generations of SConfig</caption>
             <tr>
                 <td>
@@ -353,11 +356,15 @@
                 </td>
             </tr>
             <tr>
-                <td style="text-align: center">
-                    SConfig in Windows Server, version 2004
+                <td>
+                    <em>
+                        SConfig in Windows Server, version 2004
+                    </em>
                 </td>
-                <td style="text-align: center">
-                    SConfig in Azure Stack HCI public preview
+                <td>
+                    <em>
+                        SConfig in Azure Stack HCI public preview
+                    </em>
                 </td>
             </tr>
         </table>
@@ -369,7 +376,6 @@
         <h2 id="Why">
             Wait, why?
         </h2>
-
         <p>
             If you noticed that I mentioned that SConfig is now owned by the
             Admin Center team, you may be scratching your head now: what does
@@ -438,7 +444,6 @@
             always recommend you to join domain first&mdash;it will save
             you from a lot of headache!
         </p>
-
         <p>
             In fact, helping the user with these tasks is more important than 
             ever with Azure Stack HCI. Historically, Windows Server was available
@@ -463,7 +468,6 @@
             or joining an existing one can  (and should) be done remotely, using
             your favorite centralized management tool or maybe scripts.
         </p>
-
         <p>
             <a href="#top">back to top</a>
         </p>        
@@ -471,7 +475,6 @@
         <h2 id="New">
             New features
         </h2>
-
         <p>
             Remember I told you that the scope of this release is merely feature
             parity with the legacy VBS-based SConfig? Scratch that! Of course,
@@ -484,20 +487,45 @@
         <h3 id="Default">
             Start at logon
         </h3>
-
         <p>
             When you log in to Windows Server, what do you see by default?
         </p>
 
-        <table style="margin-left: auto; margin-right: auto;">
+        <table class="center">
             <caption>Comparing logon experience</caption>
             <tr>
-                <td><img src="SConfig-03-Desktop-r.png"</td>
-                <td><img src="SConfig-04-Core-r.png"</td>
+                <td>
+                    <a href="SConfig-03-Desktop-r.png">
+                        <img
+                            src="SConfig-03-Desktop-r.png"
+                            alt="Server with Desktop Experience: Server manager
+                                graphical tool starts by default"
+                            width="500"
+                        />
+                    </a>
+                </td>
+                <td>
+                    <a href="SConfig-04-Core-r.png">
+                        <img
+                            src="SConfig-04-Core-r.png"
+                            alt="Server Core: black CMD window on top of black
+                                background"
+                            width="500"
+                        />                        
+                    </a>    
+                </td>
             </tr>
             <tr>
-                <td style="text-align: center">Server with Desktop Experience</td>
-                <td style="text-align: center">Server Core</td>
+                <td>
+                    <em>
+                        Server with Desktop Experience in Windows Server 2019
+                    </em>
+                </td>
+                <td>
+                    <em>
+                        Server Core in Windows Server, version 2004
+                    </em>
+                </td>
             </tr>
         </table>
 
@@ -515,15 +543,41 @@
             that is done slightly differently.
         </p>
 
-        <table style="margin-left: auto; margin-right: auto;">
+        <table class="center">
             <caption>SConfig starting at logon</caption>
             <tr>
-                <td><img src="SConfig-05-HVS-r.png"</td>
-                <td><img src="SConfig-05-HCIpp-r.png"</td>
+                <td>
+                    <a href="SConfig-05-HVS-r.png">
+                        <img
+                            src="SConfig-05-HVS-r.png"
+                            alt="Hyper-V Server: SConfig starts in a separate
+                                window, overlapping the CMD window"
+                            width="500"
+                        />
+                    </a>
+                </td>
+                <td>
+                    <a href="SConfig-05-HCIpp-r.png">
+                        <img
+                            src="SConfig-05-HCIpp-r.png"
+                            alt="Azure Stack HCI: SConfig starts inline within
+                                the PowerShell window"
+                            width="500"
+                        />
+                    </a>
+                </td>
             </tr>
             <tr>
-                <td style="text-align: center">Hyper-V Server</td>
-                <td style="text-align: center">Azure Stack HCI</td>
+                <td>
+                    <em>
+                        Hyper-V Server 2019
+                    </em>
+                </td>
+                <td>
+                    <em>
+                        Azure Stack HCI public preview
+                    </em>
+                </td>
             </tr>
         </table>
 
@@ -542,7 +596,6 @@
         <h3 id="Shell">
             Default Shell
         </h3>
-
         <p>
             Speaking of command prompt window... remind me, what year it is? Is
             it CMD still being the shell? <strong>Not anymore!</strong> For the
@@ -556,10 +609,19 @@
             use option <strong>[15] Exit to command line</strong> guess where you
             will end up?
         </p>
-        <p>
-            <img src="SConfig-06-PowerShell-l.gif" style="display: block;
-                 margin-left: auto; margin-right: auto;" />
+
+        <p class="center">
+            <img
+                src="SConfig-06-PowerShell-l.gif"
+                alt="After exiting SConfig you end up in PowerShell"
+            />
+            <br />
+            <em>
+                Don't be mad at my capitalization style&mdash;I hate typing
+                multiple capital letters consequently
+            </em>
         </p>
+
         <p>
             So, technically, it is PowerShell what's the default shell now. And 
             SConfig is just an app which starts automatically in the shell. But...
@@ -569,7 +631,6 @@
         <h3 id="Selection">
             Shell selection
         </h3>
-
         <p>            
             Remember, PowerShell is still
             an optional component in Windows. Yes, it comes by default&mdash;but
@@ -591,10 +652,16 @@
             fail back to the old behavior and launch CMD as the default shell!
         </p>
 
-        <p style="text-align: center;">
-            <img src="SConfig-07-noPowerShell-r.gif" style="display: block;
-                 margin-left: auto; margin-right: auto;" />
-            <em>I had to edit this one&mdash;cut out the borign parts!</em>
+        <p class="center">
+            <img
+                src="SConfig-07-noPowerShell-r.gif"
+                alt="You can uninstall PowerShell, and after reboot you end up
+                    without SConfig. Install PowerShell again to get it working"
+            />
+            <br />
+            <em>
+                I had to edit this one&mdash;cut out the boring parts!
+            </em>
         </p>
 
         <p>
@@ -607,7 +674,6 @@
         <h3 id="Restart">
             Automatic restart
         </h3>
-
         <p>
             Have you notices something interesting in the very end of the
             previous animation? Was it surprising for you if you have use Server
@@ -625,11 +691,18 @@
             not.)
         </p>
 
-        <p style="text-align: center;">
-            <img src="SConfig-08-Exit-r.gif" style="display: block;
-                 margin-left: auto; margin-right: auto;" />
-            <em>I had to capture it with actual VM window borders&mdash;otherwise
-            you might not get it how miserable it gets in the end!</em>
+        <p class="center">
+            <img
+                src="SConfig-08-Exit-r.gif"
+                alt="If you quit CMD, all you see if a black rectangular of
+                desktop background and no windows or UI elements"
+            />
+            <br />
+            <em>
+                Windows Server, version 2004. I had to capture it with actual VM
+                window borders&mdash;otherwise you might not get it how miserable
+                it gets in the end!
+            </em>
         </p>
 
         <p>
@@ -654,12 +727,18 @@
             So, Azure Stack HCI to the rescue!
         </p>
 
-        <p style="text-align: center;">
-            <img src="SConfig-08-noExit-r.gif" style="display: block;
-                 margin-left: auto; margin-right: auto;" />
-            <em>Just remember: if you really mean to log off, you should use
-            either option [12] in SConfig or type &ldquo;logoff&rdquo; in command
-            line</em>
+        <p class="center">
+            <img
+                src="SConfig-08-noExit-r.gif"
+                alt="No matter what you do, PowerShell windows with SConfig
+                    comes back"
+            />
+            <br />
+            <em>
+                Azure Stack HCI. Just remember: if you really mean to log off,
+                you should use either option <strong>[12]</strong> in SConfig or
+                type &ldquo;logoff&rdquo; in command line
+            </em>
         </p>
 
         <p>
@@ -681,9 +760,8 @@
         </p>
 
         <h3 id="Prompt">
-            No more awkward prompts
+            A cosmetic one: no more awkward prompts
         </h3>
-
         <p>
             Because it's now written in PowerShell, we started to give SConfig
             a major facelift. I.e. streamline it and make visually consistent and
@@ -700,10 +778,17 @@
             KVMs and lossy network connections.
         </p>
 
-        <p style="text-align: center;">
-            <img src="SConfig-09-Prompt-r.gif" style="display: block;
-                 margin-left: auto; margin-right: auto;" />
-            <em>sup</em>
+        <p class="center">
+            <img
+                src="SConfig-09-Prompt-r.gif"
+                alt="Various pop-up prompts come up to ask for credentials or 
+                    confirmation, or to display an error message"
+            />
+            <br />
+            <em>
+                SConfig in Windows Server, version 2004. That's what I personally
+                call awkward
+            </em>
         </p>
 
         <p>
@@ -711,22 +796,26 @@
             SConfig prompts. I.e. they're displayed inline with the text.
         </p>
 
-        <p style="text-align: center;">
-            <img src="SConfig-10-noPrompt-r.gif" style="display: block;
-                 margin-left: auto; margin-right: auto;" />
-            <em>The only prompt that we kept standing out is the credential
-            prompt. Because it's the standard secure way to prompt for credentials
-            in PowerShell</em>
+        <p class="center">
+            <img
+                src="SConfig-10-noPrompt-r.gif"
+                alt="No pop-up windows or prompts, except for the OS standard
+                    credentials dialog"
+            />
+            <br />
+            <em>
+                Azure Stack HCI. The only pop up window that we kept standing out
+                is the credential prompt. Because it's the standard secure way to
+                prompt for credentials in PowerShell
+            </em>
         </p>
 
         <p>
             <a href="#top">back to top</a>
         </p>
-
         <h2 id="Future">
             SConfig futures
         </h2>
-
         <p>
             As you can, all the above changes were more of <em>infrastructure</em>
             improvements rather than valuable new features. While they were long
@@ -734,7 +823,6 @@
             enhancements, I would totally understand if you're not as excited
             about them as we are.
         </p>
-
         <p>
             Rest assured: we do have a lot of new excitement features in the
             pipeline, and SConfig future is brighter than ever. Hopefully, we have
@@ -757,7 +845,6 @@
         <h2 id="Gotcha">
             (Maybe) top concerns and gotchas
         </h2>
-
         <p>
             Speaking of feedback, maybe I should have given you some heads up of
             what is knowingly different and was a deliberate choice of our team.
@@ -782,7 +869,6 @@
             For these and other reasons, the modern PowerShell (née
             &ldquo;PowerShell Core&rdquo;) has now black background by default, too.
         </p>
-
         <p>
             Plus, it makes it easier to immediately make sure you're in the new
             SConfig and not in the legacy one.
@@ -791,13 +877,11 @@
         <h3 id="no11">
             There's no #11 in SConfig, currently
         </h3>
-
         <p>
             I admit, this may seem a little weird. After <strong>[10] Telemetry
             Settings</strong> the next menu item is <strong>[12] Log off
             user</strong>. Did we simply miss a number by mistake?
         </p>
-
         <p>
             Not really. If you look at some of the legacy SConfig screenshots
             above, you'll see that number 11 used to be a key for Windows
@@ -806,7 +890,6 @@
             have to <em>register</em> it with Azure, however, to start using it
             for hosting production VMs.) Hence, this menu item is not displayed.
         </p>
-
         <p>
             Should we just have moved the subsequent commands one step up each,
             to make 11 key for Log off, 12 for Restart, and so on? Or should we 
@@ -819,14 +902,12 @@
             cheese. E.g. if I got a habit of pressing 12 to Log off, I would not
             be amused if suddenly it becomes a key for Restart, and so on.
         </p>
-
         <p>
             Am I right? Am I wrong? Was skipping the number the best decision?
             We honestly do not know yet, and that's one of the points of writing 
             this post. We look forward for your feedback and opinions on this, 
             among other things.
         </p>
-
         <p>
             <a href="#top">back to top</a>
         </p>
@@ -835,7 +916,6 @@
             Known issues in SConfig in Azure Stack HCI public preview (build 
             17784.1068)
         </h2>
-
         <p>
             As I said couple times already, the new SConfig in Azure Stack HCI
             public preview is our early take. By no means we believe it's feature
@@ -850,14 +930,12 @@
             All languages: Telemetry says &ldquo;Unknown&rdquo; 
             by default
         </h3>
-
         <p>
             In fact, this is not a new issue. SConfig had always behaved this way.
             But I understand it's quite confusing, especially around such
             delicate topic as data collection and privacy. So wanted to call it out
             anyway.
         </p>
-
         <p>
             When you install any operating system, the default telemetry level
             applies, unless you have changed it. The default for Windows Server
@@ -872,7 +950,6 @@
             All languages: Cannot set static IP address when accepting default
             value for Subnet mask
         </h3>
-
         <p>
             If you use SConfig to set up static IP address assignment to one of
             the network adapters, it will offer you a convenient default value
@@ -890,14 +967,12 @@
         <h3 id="DNS Server">
             All languages: DNS Servers may not be displayed
         </h3>
-
         <p>
             In the same network settings area, SConfig shows you what DNS servers
             have been configured. Except when it does not. That is, sometimes
             this list is empty, even though the DNS Servers are configured
             correctly.
         </p>
-
         <p>
             As a workaround, if DNS Servers are not displayed, or the values do
             not match what you expect them to be, check the actual settings by
@@ -911,7 +986,6 @@
         <h3 id="Rename">
             All languages: Cannot rename computer using non-Latin characters
         </h3>
-
         <p>
             When using option <strong>[2] Computer name,</strong> you cannot 
             define a new computer name using non-Latin characters, such as
@@ -920,7 +994,6 @@
             <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/rename-computer?view=powershell-5.1">
             Rename-Computer</a> cmdlet.
         </p>
-
         <p>
             As a workaround, you may use the old 
             <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc788029(v=ws.11)">
@@ -931,7 +1004,6 @@
             All languages, except English: Remote management value is shown as
             &ldquo;Disabled&rdquo;
         </h3>
-
         <p>
             As I noted before, Remote management is always enabled by default,
             unless disabled e.g. by Group Policy. However, in non-English
@@ -940,7 +1012,6 @@
             SConfig to configure and enable it again. No matter what you do,
             it will always say it's disabled.
         </p>
-
         <p>
             There are no workarounds, just be aware that remote management is in
             fact enabled, and use it as you would normally do. If something
@@ -954,7 +1025,6 @@
             All languages, except English: the key prompts ask you for localized
             input, but expect English input in fact
         </h3>
-
         <p>
             This is a very unfortunate one. Imagine you've installed Azure Stack
             HCI in French, and Logoff prompt ask you for confirmation: 
@@ -966,7 +1036,6 @@
             displayed by SCconfig. You always have to use the keys which
             correspond to English text.
         </p>
-
         <p>
             Unfortunately, there's no easy workaround today. You may either use 
             English version of Azure Stack HCI for testing, and install a language
@@ -978,7 +1047,6 @@
         <h3 id="No localization">
             Some languages: no localization
         </h3>
-
         <p>
             Given the previous issue, it may not be a very bad thing. But anyway,
             Azure Stack HCI preview is currently available in 12 languages&mdash;
@@ -999,9 +1067,8 @@
         </ul>
 
         <h3 id="QnA">
-            Something else does not work for you?
+            Something else does not quite work for you?
         </h3>
-
         <p>
             These are all the known issues we're aware right now. Is there
             something else missing? Anything not quite working up to your
@@ -1012,9 +1079,7 @@
             request a new feature, please use 
             <a href="http://aka.ms/HCI-UserVoice">our UserVoice</a> for it. Thank
             you in advance!
-
         </p>
-
         <p>
             <a href="#top">back to top</a>
         </p>
@@ -1022,7 +1087,6 @@
         <h2 id="Windows Server">
             Last but not least: SConfig in Windows Server
         </h2>
-
         <p>
             This is all great, but are we going to abandon Windows Server and 
             leave it in the limb forever with the legacy SConfig? Absolutely not!
@@ -1036,7 +1100,6 @@
             gather feedback. But the new SConfig will be part of Server Core in
             the upcoming releases of Windows Server.
         </p>
-
         <p>
             <a href="#top">back to top</a>
         </p>
