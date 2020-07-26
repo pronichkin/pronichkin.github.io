@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Server Configuration utility (SConfig) in Azure Stack HCI and beyond</title>
+        <title>
+            Server Configuration utility (SConfig) in Azure Stack HCI and beyond
+        </title>
         <style>
             * {
                 font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
@@ -17,8 +19,7 @@
             version 2020-07-21 by <a href="/">Artem Pronichkin</a><br />
             submit a
             <a href="https://github.com/pronichkin/pronichkin.github.io/issues">
-                comment
-            </a> (&ldquo;issue&rdquo;) or
+                comment</a> (&ldquo;issue&rdquo;) or
             <a href="https://github.com/pronichkin/pronichkin.github.io/blob/master/SConfig.html">
                 edit
             </a>
@@ -38,45 +39,69 @@
                 </a>
             </li>
             <li>
-                <a href="#Why">Wait, why?</a>
+                <a href="#Why">
+                    Wait, why?
+                </a>
             </li>
             <li>
-                <a href="#New">New features</a>
+                <a href="#New">
+                    New features
+                </a>
                 <ul>
                     <li>
-                        <a href="#Default">Starts at logon</a>
+                        <a href="#Default">
+                            Starts at logon
+                        </a>
                     </li>
                     <li>
-                        <a href="#Shell">Default shell</a>
+                        <a href="#Shell">
+                            Default shell
+                        </a>
                     </li>
                     <li>
-                        <a href="#Selection">Shell selection</a>
+                        <a href="#Selection">
+                            Shell selection
+                        </a>
                     </li>
                     <li>
-                        <a href="#Restart">Automatic restart</a>
+                        <a href="#Restart">
+                            Automatic restart
+                        </a>
                     </li>
                     <li>
-                        <a href="#Prompt">No more awkward prompts</a>
+                        <a href="#Prompt">
+                            No more awkward prompts
+                        </a>
                     </li>
                 </ul>
             </li>
             <li>
-                <a href="#Future">SConfig futures</a>
+                <a href="#Future">
+                    SConfig futures
+                </a>
             </li>
             <li>
-                <a href="#Gotcha">(Maybe) top concerns and gotchas</a>
+                <a href="#Gotcha">
+                    (Maybe) top concerns and gotchas
+                </a>
                 <ul>
                     <li>
-                        <a href="#noBlue">SConfig is not blue anymore</a>
+                        <a href="#noBlue">
+                            SConfig is not blue anymore
+                        </a>
                     </li>
                     <li>
-                        <a href="#no11">There's no #11 in SConfig, currently</a>
+                        <a href="#no11">
+                            There's no #11 in SConfig, currently
+                        </a>
                     </li>
                 </ul>
             </li>
             <li>
-                <a href="#Known">Known issues in SConfig in Azure Stack HCI public
-                preview (build 17784.1068)</a>
+                <a href="#Known">
+                    Known issues in SConfig in Azure Stack HCI public preview 
+                    (build 17784.1068)
+                </a>
                 <ul>
                     <li>
                         <a href="#Telemetry">
@@ -114,6 +139,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#Rename">
+                            All languages: Cannot rename computer using non-Latin
+                            characters
+                        </a>
+                    </li>
+                    <li>
                         <a href="#QnA">
                             Something else does not work for you?
                         </a>
@@ -138,7 +169,8 @@
         <p>
             The idea behind Server Core has always been to provide a minimalistic,
             stripped-down, purposefully built server operating system. It contains
-            &ldquo;just enough&rdquo to run your typical server workload&mdash;such
+            &ldquo;just enough&rdquo; to run your typical server 
+            workload&mdash;such
             as a database system, a network service or a Hyper-converged
             infrastructure (HCI.) It does not include a desktop user environment
             such as Start menu, taskbar, file explorer, etc. This makes Server 
@@ -852,6 +884,25 @@
                 Get-DnsClientServerAddress
             </a>
             in PowerShell.
+        </p>
+
+        <h3 id="Rename">
+            All languages: Cannot rename computer using non-Latin characters
+        </h3>
+
+        <p>
+            When using option <strong>[2] Computer name,</strong> you cannot 
+            define a new computer name using non-Latin characters, such as
+            Cyrillic or Asian symbols. Anything except A-Z, numbers and hyphen
+            is not allowed. This behavior is consistent with
+            <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/rename-computer?view=powershell-5.1">
+            Rename-Computer</a> cmdlet.
+        </p>
+
+        <p>
+            As a workaround, you may use the old 
+            <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc788029(v=ws.11)">
+            Netdom</a> utility in PowerShell.
         </p>
 
         <h3 id="Remote management">
