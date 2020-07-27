@@ -1,18 +1,24 @@
 * {
-    font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+    font-family:      Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+}
+
+body {
+    margin-left:      10%;
+    margin-right:     10%;
+    margin-bottom:     5%;
 }
 
 .code {
     background-color: blue;
-    color: white;
-    font-family: Consolas,monaco,monospace;
-    padding: 10px;
-    margin-left: 15px;
-    margin-right: 15px;
+    color:            white;
+    font-family:      Consolas,monaco,monospace;
+    padding:          10px;
+    margin-left:      15px;
+    margin-right:     15px;
 }
 
 .center {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+    margin-left:      auto;
+    margin-right:     auto;
+    text-align:       center;
 }
