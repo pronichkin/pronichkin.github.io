@@ -5,6 +5,13 @@
     Value        =  0
 }
 
+$PropertyParamCredentialDelegation = @{
+
+    Path         = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows'
+    Name         = 'CredentialsDelegation'
+    Force        = $True
+}
+
 $PropertyParamAllowProtectedCred = @{
 
     Path         = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation'
@@ -16,9 +23,14 @@ $PropertyParamAllowProtectedCred = @{
 
 [System.Void]( Invoke-Command -Session $psSession -ScriptBlock {
 
+    New-Item         @using:PropertyParamCredentialDelegation
     Set-ItemProperty @using:PropertyParamDenyTSConnection
     New-ItemProperty @using:PropertyParamAllowProtectedCred
 } )
+
+Invoke-Command -Session $psSession -ScriptBlock {
+    Start-Service -Name 'TermService'
+}
 
 # Localization-friendly ID for “Remote Desktop” group
 Enable-NetFirewallRule -CimSession $cimSession -Group '@FirewallAPI.dll,-28752'
