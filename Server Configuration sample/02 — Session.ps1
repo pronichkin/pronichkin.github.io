@@ -1,4 +1,4 @@
-﻿  # $Credential = Get-Credential
+﻿    $Credential = Get-Credential
 
 $Name       = [System.Collections.Generic.List[
     System.String
@@ -87,6 +87,9 @@ $psSession  = [System.Collections.Generic.List[
   # $Name.Add( 'ArtemP-Dsktp-02' )
     $Name.Add( 'ArtemP-Trbn-01' )
     $Name.Add( 'ArtemP-Trbn-02' )
+    $Name.Add( 'ArtemP27s'      )
+  # $Name.Add( 'ArtemP-HCI-50'  )
+  # $Name.Add( 'ArtemP-HCI-51'  )
 
 Clear-DnsClientCache
 

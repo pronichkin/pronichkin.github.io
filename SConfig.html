@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Server Configuration utility (SConfig) in Azure Stack HCI and beyond
+        </title>
+        <link
+            rel="stylesheet"
+            href="Style.css"
+        />
+        <link
+            rel="shortcut icon"
+            href="favicon.png"
+            type="image/png"
+        />
+    </head>
+    <body>
+        <h1 id="top">
+            Server Configuration utility (SConfig) in Azure Stack HCI and beyond
+        </h1>
+
+        <p>
+            version 2020-07-21 by <a href="/">Artem Pronichkin</a><br />
+            submit a
+            <a href="https://github.com/pronichkin/pronichkin.github.io/issues">
+                comment</a> (&ldquo;issue&rdquo;) or
+            <a href="https://github.com/pronichkin/pronichkin.github.io/blob/master/SConfig.html">
+                edit
+            </a>
+        </p>
+
+        <h2 id="Contents">Contents</h2>
+        <ul>
+            <li>
+                <a href="#History">
+                    A brief (yes, brief) history of Server Core manageability
+                </a>
+            </li>
+            <li>
+                <a href="#2.0">
+                    Introducing PowerShell-based SConfig (aka &ldquo;SConfig
+                    2.0&rdquo;)
+                </a>
+            </li>
+            <li>
+                <a href="#Why">
+                    Wait, why?
+                </a>
+            </li>
+            <li>
+                <a href="#New">
+                    New features in Azure Stack HCI public preview
+                </a>
+                <ul>
+                    <li>
+                        <a href="#Default">
+                            Starts at logon
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Shell">
+                            Default shell
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Selection">
+                            Shell selection
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Restart">
+                            Automatic restart
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Prompt">
+                            No more awkward prompts
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#Future">
+                    SConfig futures
+                </a>
+            </li>
+            <li>
+                <a href="#Gotcha">
+                    (Maybe) top concerns and gotchas
+                </a>
+                <ul>
+                    <li>
+                        <a href="#noBlue">
+                            SConfig is not blue anymore
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#no11">
+                            There's no #11 in SConfig, currently
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#Known">
+                    Known issues in SConfig in Azure Stack HCI public preview 
+                    (build 17784.1068)
+                </a>
+                <ul>
+                    <li>
+                        <a href="#Telemetry">
+                            All languages: Telemetry says &ldquo;Unknown&rdquo; 
+                            by default
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Subnet mask">
+                            All languages: Cannot set static IP address when
+                            accepting default value for Subnet mask
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#DNS Server">
+                            All languages: DNS Servers may not be displayed
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Rename">
+                            All languages: Cannot rename computer using non-Latin
+                            characters
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Remote management">
+                            All languages, except English: Remote management 
+                            value is shown as &ldquo;Disabled&rdquo;
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Localized prompt">
+                            All languages, except English: the key prompts ask 
+                            you for localized input, but expect English input in
+                            fact
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#No localization">
+                            Some languages: no localization
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#QnA">
+                            Something else does not quite work for you?
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#Windows Server">
+                    Last but not least: SConfig in Windows Server
+                </a>
+            </li>
+        </ul>
+
+        <h2 id="History">
+            A brief <em>(yes, brief)</em> history of Server Core manageability
+        </h2>
+        <p>
+            You may be new to Server Core, and I will forgive you. Server Core 
+            has only been around for 12 years. It has debuted in Windows Server
+            2008, released in February 2008 (let alone beta versions.)
+        </p>
+        <p>
+            The idea behind Server Core has always been to provide a minimalistic,
+            stripped-down, purposefully built server operating system. It contains
+            &ldquo;just enough&rdquo; to run your typical server 
+            workload&mdash;such
+            as a database system, a network service or a Hyper-converged
+            infrastructure (HCI.) It does not include a desktop user environment
+            such as Start menu, taskbar, file explorer, etc. This makes Server 
+            Core a poor choice for some workloads such as Remote desktop services
+            (formerly known as Terminal services) or legacy software where 
+            application compatibility is a concern.
+        </p>
+        <p>
+            For this reason, many customers felt in love with Server Core, and 
+            some others tend to avoid it. Historically, the most professional
+            and savvy administrators appreciated Server Core for small size, 
+            flexibility, faster deployment and reduced attack surface. Additionally,
+            the limitations of local user interface are often seen as a benefit 
+            because it is less prone to human error and prevents <em>configuration
+            drift</em> over time, since it encourages remote management at scale
+            and automation.
+            In fact, Microsoft <a href="https://channel9.msdn.com/Events/TechEd/NorthAmerica/2012/WSV309">
+            declared</a> Server Core the default and recommended installation
+            option for Windows Server since 2012.
+            (<a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/ee941130(v=ws.10)">And</a>
+            we 
+            <a href="https://channel9.msdn.com/Events/TechEd/NorthAmerica/2013/MDC-B339">have</a>
+            been
+            <a href="https://channel9.msdn.com/Events/TechEd/NorthAmerica/2013/C9-17">quite</a>
+            persistent
+            <a href="https://social.technet.microsoft.com/Forums/windowsserver/en-US/85472731-f9ff-4971-a8d8-182f87dbd6ea/best-practices-analyzer-recommends-server-core-server-2012-build-9200">about</a>
+            it
+            <a href="https://cloudblogs.microsoft.com/windowsserver/2018/07/05/server-core-and-server-with-desktop-which-one-is-best-for-you/">since</a>
+            then.
+            <a href="https://cloudblogs.microsoft.com/windowsserver/2019/10/03/windows-admin-center-unleashes-server-core-adoption/">Really</a>.)
+        </p>
+        <p>
+            On the flip side, less experienced administrators or IT generalists
+            often found Server Core confusing and not intuitive enough. The primary
+            way to configure and troubleshoot Server Core has always been command
+            line&mdash;at least until you set up functional networking connection 
+            and some sort of authentication (preferably via Active Directory.)
+            Yes, there are options to avoid command line completely. For instance,
+            one could use Answer files (aka &ldquo;unattend.xml&rdquo;) or System
+            Center for OS deployment and initial configuration. But these come at
+            additional cost&mdash;in terms of professional experience, licensing
+            money, or both. For this reason, shortly after the very first release
+            of Server Core in Windows Server 2008, it formed a niche for various
+            friendly local configuration tools. Among which,
+            <a href="http://web.archive.org/web/20080403001129/http://blogs.microsoft.co.il/blogs/guyt/archive/2008/03/22/windows-server-core-coreconfigurator-to-the-rescue.aspx">CoreConfigurator</a>
+            happened to be the first one. Several
+            <a href="https://petri.com/manage-server-2008-r2-core-with-visual-core-configurator">other
+            similar tools</a> followd quickly. And
+            <a href="https://4sysops.com/archives/review-smartx-coreconfigurator">some
+            of them</a> even had commercial versions!
+        </p>
+        <p>
+            By the way, Server Core in Windows Server 2008 was originally released
+            with a new inbox configuration tool, a small script creatively named
+            &ldquo;SCregedit.wsf&rdquo;. It offered some basic features like
+            <a href="https://docs.microsoft.com/en-us/windows-server/administration/server-core/server-core-servicing#patch-server-core-automatically-with-windows-update">configuring
+            Windows update</a> and
+            <a href="https://support.microsoft.com/en-us/help/555964">enabling
+            Remote desktop</a>, but also exposed some very niche  settings like
+            IPsec or DNS SRV record configuration for domain controllers. Heck,
+            it even came with a built-in list of other helpful commands! Try this:
+        </p>
+
+        <p class="code">
+            CScript.exe /noLogo C:\Windows\System32\SCregEdit.wsf /cli
+        </p>
+        
+        <p>
+            Hey, don't look at me like that&mdash;remember, it was <em>before
+            Internet became available on every phone</em> in every corner of the
+            planet. Also,
+            before PowerShell got installed by default everywhere, so you
+            could not even rely on the universal <em>Verb-Noun</em> naming
+            convention to discover new commands on your own.
+        </p>
+		<p>
+            But we heard the feedback loud and clear: Windows Server (and Hyper-V
+            Server) needs a free, inbox <em>convenient</em> local configuration
+            tool. This is how
+            <a href="https://techcommunity.microsoft.com/t5/virtualization/windows-server-2008-r2-core-introducing-sconfig/ba-p/381656">SConfig
+            was born</a>, debuting in Windows Server 2008 R2 and released in 2009.
+            Unlike those 3<sup>rd</sup> party configuration tools, SConfig did
+            not &ldquo;play pretend Control panel.&rdquo; It had no fancy icons
+            (rather, no icons whatsoever)
+            and no mouse-friendly menus. It was a classic console app with
+            input-driven menu. E.g. you had to type <strong>1</strong> to enter
+            domain join command, or type <strong>2</strong> to rename computer, 
+            and so on. (If you are unfamiliar with SConfig and would like to
+            learn more,
+            <a href="https://docs.microsoft.com/windows-server/get-started/sconfig-on-ws2016">here's
+            a decent document</a> written at Windows Server 2016 times.)
+        </p>
+        <p>
+            SConfig tremendously helped performing initial server configuration
+            tasks. This was when customers started seriously considering
+            Server Core as organization standard, not an esoteric toy. But, to be
+            honest, this did not solve Server Core manageability problem completely.
+            And some of those 3<sup>rd</sup> party configuration tools continued
+            to evolve. In fact,
+            <a href="https://archive.codeplex.com/?p=coreconfig">some
+            of them</a> are still available, even though
+            <a href="https://archive.codeplex.com/?p=corefig">archived</a> or 
+            seemingly <a href="https://github.com/ejsiron/Corefig">abandoned</a>
+            for quite some time.
+        </p>
+        <p>          
+            Moreover, SConfig was written in VBScript&mdash;language which
+            already turned 13 in 2009. In Windows Server 2008, PowerShell was not
+            even an option because .NET Framework was not available on Server Core
+            (even though there were some pretty hacky ways to install it forcibly.)
+            Windows Server 2008 R2 was the first Server Core release
+            to officially include .NET Framework and PowerShell. However, they
+            were not installed by default back then. Quite interestingly
+            <a href="https://support.microsoft.com/help/976736">SConfig could be 
+            used</a> to install PowerShell on Server Core. So, those days 
+            VBScript was the only viable option.
+        </p>
+        <p>            
+            But this also came at cost. Part of that cost was no native support
+            for localization. SConfig in any language was a completely separate
+            script file. Another aspect was not so obvious but turned out a big
+            deal over time. VBScript is so old and unpopular that fixing bugs in
+            SConfig turned out a big challenge, let alone extending its
+            functionality with new features. In fact, nobody touched this 
+            code with any improvements or modernizations for more than a decade.
+            Until today.
+        </p>
+        <p>
+            (I may be exaggerating here, but just a tiny bit!)
+        </p>
+        <p>
+            <a href="#top">back to top</a>
+        </p>
+
+        <h2 id="2.0">
+            Introducing PowerShell-based SConfig (aka &ldquo;SConfig 2.0&rdquo;)
+        </h2>
+        <p>
+            Windows Server kept evolving for the past 10 years. In fact, it was
+            quite a journey! Meanwhile, SConfig
+            might have seem stuck in time. But not our plans to make Server Core 
+            ubiquitous and more flexible for different customer scenarios. 
+            <strong>SConfig 2.0</strong> started last year as an intern project.
+            The goal was to rewrite SConfig in PowerShell, effectively opening
+            the door for future improvements and feature additions.
+        </p>
+        <p>
+            Now this project is almost concluded. Little known fact: SConfig feature
+            was officially adopted by our awesome &ldquo;Server management
+            experiences&rdquo; (SME) aka
+            <a href="https://www.microsoft.com/windows-server/windows-admin-center">Windows
+            Admin Center</a> (WAC) team. While we're still flushing out
+            the details and fixing a few remaining bugs, the new PowerShell-based
+            SConfig has finally seen the light of day. It is available in the
+            Public preview release of Azure Stack HCI. (If you have not heard of
+            Azure Stack HCI recently, stop what you're doing and go read the
+            <a href="http://aka.ms/AzureStackHciPreviewBlog">announcement</a>
+            from Microsoft Inspire 2020, or watch 
+            <a href="https://myinspire.microsoft.com/sessions/4a50e354-b3a8-4d54-9d2a-9dc723ac1030?source=sessions">
+            this session </a> recorded by my great friend Cosmos Darwin.)
+        </p>
+        <p>
+            To be clear: while SConfig has been rewritten in PowerShell from 
+            ground up (no more VBscript!), this does not mean it has been transformed
+            into PowerShell cmdlets. Quite the opposite: the tool's look and feel
+            remains the same, familiar for those who got used to managing Server
+            Core over the past decade. And while we have rather ambitious plans of
+            extending its functionality, the scope of
+            this preview is 1:1 feature parity with the legacy SConfig, as it
+            exists today in Windows Server.
+        </p>        
+
+        <table class="center" >
+            <caption>Comparing two generations of SConfig</caption>
+            <tr>
+                <td>
+                    <a href="SConfig-01-2004.png">
+						<img
+							src="SConfig-01-2004.png"
+							alt="SConfig in Windows Server, version 2004: white
+                                 text in console on blue background"
+                            width="500"
+                        />
+                    </a>
+                </td>
+                <td>
+                    <a href="SConfig-02-HCIppA.png">
+                        <img
+                            src="SConfig-02-HCIppA.png" 
+                            alt="SConfig in Azure Stack HCI public preview: white
+                                 text in console on black background"
+                            width="500"
+                        />
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <em>
+                        SConfig in Windows Server, version 2004
+                    </em>
+                </td>
+                <td>
+                    <em>
+                        SConfig in Azure Stack HCI public preview
+                    </em>
+                </td>
+            </tr>
+        </table>
+
+        <p>
+            <a href="#top">back to top</a>
+        </p>
+
+        <h2 id="Why">
+            Wait, why?
+        </h2>
+        <p>
+            If you noticed that I mentioned that SConfig is now owned by the
+            Admin Center team, you may be scratching your head now: what does
+            SConfig have to do with Admin Center? Isn't it an unnatural,
+            artificial partnership? Doesn't SConfig compete with Admin Center,
+            to some degree? Should one of them fully absorb and replace the other?
+            Is it yet another case where Microsoft has a &ldquo;split brain&rdquo;
+            symptom and duplicates efforts because it does not know what it's doing?
+        </p>
+
+        <p>
+            Well, not at all! Here's the idea that drives us. SConfig is a great
+            <em>inbox</em> management too, and will always be. It has it
+            advantages of being always available and lightweight, but it will
+            never be as easy to use
+            and as powerful as Admin Center. On the other hand, Admin Center is
+            a great management tool which is <em>out of the box</em>. You need to
+            have your server up and running, and ready for remote management in
+            order to take advantage of Admin Center, or of any other central
+            management tools that you might prefer, such as System Center.
+        </p>
+        <p>
+            In other words, the job of SConfig is not to replace Admin Center (or
+            vice-versa.) SConfig works best when you need to prepare a server
+            for being managed remotely. This typically includes no more than five
+            steps.
+        </p>
+        
+        <ul>
+            <li>
+                Configure networking, if you are not using DHCP for some reason.
+            </li>
+            <li>
+                Rename computer, if you're not happy with the default
+                auto-generated name (understandable.)
+            </li>
+            <li>
+                Join the domain, so that you can benefit from transparent
+                authentication when managing remotely and do not have to
+                wrap your head around CredSSP settings and Trusted Hosts.
+            </li>
+            <li>
+                Add a domain user or security group to local Administrators
+                group so that you can manage the server without having to be
+                a domain admin. (Being a domain admin is a terrible, terrible
+                idea.)
+            </li>
+            <li>
+                <em>Maybe</em> enable remote desktop and install updates
+                right away. (Note that typically you do not <em>have to</em>
+                do that, as you can always do it later, when managing your
+                server remotely with Admin Center, System Center and/or Group
+                Policy.)
+            </li>
+        </ul>
+
+        <p>
+            That's all! Note that typically you do not need to enable
+            remote management (WinRM) because it's enabled by default in
+            all modern server operating systems. (It is disabled by
+            default on Windows 10, though.) Neither you typically need
+            to change Firewall rules. By default, 
+            <a href="https://docs.microsoft.com/powershell/module/microsoft.powershell.core/about/about_remote_requirements?view=powershell-5.1#windows-network-locations">remote 
+            access from <em>any subnet</em> is permitted</a>, provided this
+            subnet is within your Active Directory boundaries. You may still
+            have to explicitly enable this in case you want to
+            <a href="https://docs.microsoft.com/windows-server/manage/windows-admin-center/support/troubleshooting#are-you-connecting-to-a-workgroup-machine-on-a-different-subnet">allow
+            remote management from a different subnet while not being
+            domain-joined</a>. But remember, we always recommend you to join
+            a domain first&mdash;and SConfig is a great tool for that! It will
+            save you from a lot of headache.
+        </p>
+        <p>
+            In fact, helping the user with these tasks is more important than 
+            ever with Azure Stack HCI. Historically, Windows Server was available
+            in two installation options: Server Core and Server with Desktop 
+            Experience. So, inexperienced users and IT generalists would likely
+            prefer Desktop Experience, while experienced admins often deployed
+            Server Core. At the same time, HCI (SDDC) features in Windows Server, such
+            as Storage spaces direct (S2D) and Software-defined networking (SDN)
+            were only available in Datacenter edition. It made these features
+            primarily targeted to large enterprise customers, sometimes leaving
+            out smaller IT shops. And, by coincidence, large enterprise is where
+            most of the experienced admins were employed. Now, with Azure Stack
+            HCI we're trying hard to break this tradition and promote HCI/SDDC
+            features to small and medium business (SMB), as well as remote offices
+            and branch office (RO/BO) scenarios. On the other hand, unlike Windows
+            Server, Azure Stack HCI is only available in Server Core. And hence
+            convenient, streamlined local experience for initial configuration 
+            on Server Core becomes a new critical requirement. This is why
+            SConfig is nowadays more important than ever!
+        </p>
+        <p>
+            Of course, any subsequent management task, such as forming a cluster
+            or joining an existing one can  (and should) be done remotely, using
+            your favorite centralized management tool, or maybe scripts. (Hey
+            <a href="https://twitter.com/jaromirkaspar/status/1286450189939757057?s=20">Jaromir</a>!)
+        </p>
+        <p>
+            <a href="#top">back to top</a>
+        </p>        
+
+        <h2 id="New">
+            New features in Azure Stack HCI public preview
+        </h2>
+        <p>
+            Remember I told you that the scope of this release is merely feature
+            parity with the legacy VBScript-based SConfig? Scratch that! Of course,
+            we could not release a new thing which 
+            is only <em>as good as</em> the old one. And while we have to hold
+            our excitement for many more new features for longer, there's still
+            a couple of them available already in Azure Stack HCI today!
+        </p>
+
+        <h3 id="Default">
+            Start at logon
+        </h3>
+        <p>
+            When you log in to Windows Server, what do you see by default?
+        </p>
+
+        <table class="center">
+            <caption>Comparing logon experience</caption>
+            <tr>
+                <td>
+                    <a href="SConfig-03-Desktop-r.png">
+                        <img
+                            src="SConfig-03-Desktop-r.png"
+                            alt="Server with Desktop Experience: Server manager
+                                graphical tool starts by default"
+                            width="500"
+                        />
+                    </a>
+                </td>
+                <td>
+                    <a href="SConfig-04-Core-r.png">
+                        <img
+                            src="SConfig-04-Core-r.png"
+                            alt="Server Core: black CMD window on top of black
+                                background"
+                            width="500"
+                        />                        
+                    </a>    
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <em>
+                        Server with Desktop Experience in Windows Server 2019
+                    </em>
+                </td>
+                <td>
+                    <em>
+                        Server Core in Windows Server, version 2004
+                    </em>
+                </td>
+            </tr>
+        </table>
+
+        <p>
+            Ouch, Server Core does not look very friendly! This minimalistic black 
+            box may be ideal for hardcore IT Pros with 10 years of industry
+            experience, but that's not everyone. Yes, you might know about
+            SConfig (thansk for reading my post!) But what if you don't? Or, you
+            might have heard of it&mdash;but how do you use it? Rejoice, SConfig
+            now starts by default when you log on!
+        </p>
+        <p>
+            Technically, this is <em>not</em> a new feature. SConfig does start
+            by default in Hyper-V Server already (but not in Windows Server.)
+            However, that is done slightly differently.
+        </p>
+
+        <table class="center">
+            <caption>SConfig starting at logon</caption>
+            <tr>
+                <td>
+                    <a href="SConfig-05-HVS-r.png">
+                        <img
+                            src="SConfig-05-HVS-r.png"
+                            alt="Hyper-V Server: SConfig starts in a separate
+                                window, overlapping the CMD window"
+                            width="500"
+                        />
+                    </a>
+                </td>
+                <td>
+                    <a href="SConfig-05-HCIpp-r.png">
+                        <img
+                            src="SConfig-05-HCIpp-r.png"
+                            alt="Azure Stack HCI: SConfig starts inline within
+                                the PowerShell window"
+                            width="500"
+                        />
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <em>
+                        Hyper-V Server 2019
+                    </em>
+                </td>
+                <td>
+                    <em>
+                        Azure Stack HCI public preview
+                    </em>
+                </td>
+            </tr>
+        </table>
+
+        <p>
+            As you can see, in Hyper-V Server, SConfig started as a separate 
+            window. This is certainly better than no SConfig at all, but might 
+            have been confusing for some. E.g. which window should I use? Why is
+            the other window even there? Why do they overlap? Specifically, if
+            you are using remote server gear with a crappy IP-KVM solution, or
+            log on locally while sitting in the datacenter with no mouse, this
+            design was suboptimal. Now, with
+            Azure Stack HCI, SConfig starts inline with command prompt window. In other words,
+            SConfig is truly <strong>the new default shell</strong> for server
+            management!
+        </p>
+
+        <h3 id="Shell">
+            Default Shell
+        </h3>
+        <p>
+            Speaking of command prompt window... remind me, what year it is? Is
+            it still CMD being the shell? <strong>Not anymore!</strong> For the
+            first time in history, the default shell on a server operating system
+            is PowerShell!
+        </p>
+        <p>
+            It might not be very obvious from the pictures, but think of it for
+            a second. Given that SConfig is now written in PowerShell, it
+            <em>has to run</em> in a PowerShell window! And, actually, if you 
+            use option <strong>[15] Exit to command line</strong> guess where you
+            will end up?
+        </p>
+
+        <p class="center">
+            <img
+                src="SConfig-06-PowerShell-l.gif"
+                alt="After exiting SConfig you end up in PowerShell"
+            />
+            <br />
+            <em>
+                Don't be mad at my capitalization style&mdash;I hate typing
+                multiple capital letters consequently
+            </em>
+        </p>
+
+        <p>
+            So, technically, it is PowerShell what's the default shell now. And 
+            SConfig is just an app which starts automatically in the shell. But...
+            this is only a part of the story.
+        </p>
+        
+        <h3 id="Selection">
+            Shell selection
+        </h3>
+        <p>            
+            Remember, PowerShell is still an optional component in the operating
+            system. Yes, it is installed by default&mdash;but
+            one can still remove it from the OS, as well as from the base image.
+            Who would remove PowerShell? Well, people who do not need it. And they
+            might want to reduce image size even further. For example, you might
+            also want to remove .NET Framework. This kind of makes sense: after
+            all, it's a big chunk of code, and it also requires frequent updates.
+            Worse of all, those updates are not part of OS cumulative updates. 
+            So, if you feel really ascetic, you might end up removing .NET
+            Framework, but this will also remove PowerShell because it depends on
+            the former.
+        </p>
+        <p>
+            Of course, given that PowerShell is now the default shell, we cannot
+            leave anyone without any shell whatsoever. So, instead of just 
+            hard-coding PowerShell as the default shell unconditionally, we had to
+            make the OS smarter. Now, if PowerShell is not available, it will
+            fail back to the old behavior and launch CMD as the default shell!
+        </p>
+
+        <p class="center">
+            <img
+                src="SConfig-07-noPowerShell-r.gif"
+                alt="You can uninstall PowerShell, and after reboot you end up
+                    without SConfig. Install PowerShell again to get it working"
+            />
+            <br />
+            <em>
+                I had to edit this one&mdash;cut out the boring parts!
+            </em>
+        </p>
+
+        <p>
+            Fun fact: in the above animation you may have noticed that removing
+            PowerShell required reboot&mdash;because it was in use. In fact, we
+            were using PowerShell to remove PowerShell! But adding it back did
+            not require a reboot, because we had to use CMD and DISM for it.
+        </p>
+
+        <h3 id="Restart">
+            Automatic restart
+        </h3>
+        <p>
+            Have you notices something interesting in the very end of the
+            previous animation? It might be surprising for you if you have used
+            Server Core before. This is actually pretty cool. You may want to get back
+            and watch it again. Take your time.
+        </p>
+        <p>
+            For those who have not used Server Core before (or it's been a while),
+            let me remind you. Arguably, this was the single biggest pain point
+            of Server Core, especially for novice admins. Imagine you were doing
+            something in the command line, but got stuck. Or you just did not 
+            like it how it's going. Or you did an awkward move with your mouse. 
+            Or maybe you just wanted to exit the session and thought that the
+            &ldquo;exit&rdquo; command was your friend. (Spoiler alert: it was
+            not.)
+        </p>
+
+        <p class="center">
+            <img
+                src="SConfig-08-Exit-r.gif"
+                alt="If you quit CMD, all you see if a black rectangular of
+                desktop background and no windows or UI elements"
+            />
+            <br />
+            <em>
+                Windows Server, version 2004. I had to capture it with actual VM
+                window borders&mdash;otherwise you might not get it how miserable
+                it gets in the end!
+            </em>
+        </p>
+
+        <p>
+            Yes, that's right. If you closed the CMD window, or exited it, or
+            somehow else made it disappear you would end up with... pretty much
+            nothing. Just an empty black space. Remember, there's no taskbar or
+            Start menu in Server Core. So, there's nowhere to even log off.
+        </p>
+        <p>
+            What would you do? I bet, many customers, should they found themselves
+            in this unfortunate situation, would just forcibly reboot the server.
+            You know, by holding the power button... Of course, there were better
+            ways out of this. For instance, you could gracefully restart it
+            remotely. Or open a PowerShell remoting session. Or log in as another
+            user. Or... if you were really creative, you could hit Ctrl+Alt+Del
+            (Ctrl+Alt+End in RDP) and use it to log off, or even summon the Task
+            Manager, and use <em>it</em> to launch a new instance of CMD! But
+            certainly, it would be too na&#239;ve from us to expect that level of
+            trickery from an average server admin.
+        </p>
+        <p>
+            So, Azure Stack HCI to the rescue!
+        </p>
+
+        <p class="center">
+            <img
+                src="SConfig-08-noExit-r.gif"
+                alt="No matter what you do, PowerShell windows with SConfig
+                    comes back"
+            />
+            <br />
+            <em>
+                Azure Stack HCI. Just remember: if you really mean to log off,
+                you should use either option <strong>[12]</strong> in SConfig or
+                type &ldquo;logoff&rdquo; in command line
+            </em>
+        </p>
+
+        <p>
+            As you see&mdash;no matter what you do, SConfig always gets your back!
+            PowerShell restarts automatically, and SConfig pops up&mdash;as the 
+            decent default shell should! (Of course, Explorer.exe does the same
+            on Windows 10 and Server with Desktop Experience.)
+        </p>
+        <p>
+            And before you ask&mdash;yes, this behavior works for when CMD is the
+            default shell
+            in case PowerShell is uninstalled. Just a small caveat: in this case,
+            no SConfig for you! As it's a PowerShell app now, it cannot be run
+            when PowerShell is not avaiable. I assume if you're so sophisticated
+            that you decided to remove PowerShell, you know your ways and may 
+            not need SConfig whatsoever. And if you just uninstalled PowerShell
+            (or .NET Framework) by mistake you can always use DISM in CMD to
+            enable it back.
+        </p>
+
+        <h3 id="Prompt">
+            A cosmetic one: no more awkward prompts
+        </h3>
+        <p>
+            Because it's now written in PowerShell, we started to give SConfig
+            a major facelift. I.e. streamline it and make visually consistent and
+            more pleasant to look at. This work is not done yet, but here's one 
+            early move.
+        </p>
+        <p>            
+            When using the legacy SConfig, every now and then you
+            might face with some pop-up window which does not look like it belongs
+            here. E.g. sometimes it was a black box asking for credentials, and
+            sometimes&mdash;a GUI window with actual buttons. (Buttons? In
+            <em>my</em> SConfig? No way!) I mean, they did their job, but user
+            experience was suboptimal and confusing, especially over low-perf
+            KVMs and lossy network connections.
+        </p>
+
+        <p class="center">
+            <img
+                src="SConfig-09-Prompt-r.gif"
+                alt="Various pop-up prompts come up to ask for credentials or 
+                    confirmation, or to display an error message"
+            />
+            <br />
+            <em>
+                SConfig in Windows Server, version 2004. That's what I personally
+                call awkward
+            </em>
+        </p>
+
+        <p>
+            So, we cleaned this all up. Now all the prompts look like native
+            SConfig prompts. I.e. they're displayed inline with the text.
+        </p>
+
+        <p class="center">
+            <img
+                src="SConfig-10-noPrompt-r.gif"
+                alt="No pop-up windows or prompts, except for the OS standard
+                    credentials dialog"
+            />
+            <br />
+            <em>
+                Azure Stack HCI. The only pop up window that we kept standing out
+                is the credential prompt. Because it's the standard secure way to
+                prompt for credentials in PowerShell
+            </em>
+        </p>
+
+        <p>
+            <a href="#top">back to top</a>
+        </p>
+        <h2 id="Future">
+            SConfig futures
+        </h2>
+        <p>
+            As you can see, all the above changes were more of
+            <em>infrastructure</em> improvements rather than valuable new
+            features. While they were long due and absolutely necessary to lay
+            down the foundation for future enhancements, I would totally
+            understand if you're not as excited about them as we are.
+        </p>
+        <p>
+            Rest assured: we do have a lot of new excitement features in the
+            pipeline, and SConfig future is brighter than ever. Hopefully, we have
+            proven this point so far. That said, we
+            have not yet finished <em>prioritizing</em> this work, i.e. we are 
+            yet to decide what to build sooner than later. So, as often with
+            roadmap development, we need your help! Please let us know what 
+            features <em>you</em> need most or want to see in SConfig. The
+            preferred way to log this feedback is through 
+            <a href="http://aka.ms/HCI-UserVoice">Azure Stack HCI UserVoice</a>.
+            Alternatively, you can hit me up on
+            <a href="http://twitter.com/Pronichkin">Twitter</a> or
+            <a href="mailto:artem.pronichkin@microsoft.com">email</a>.
+        </p>
+
+        <p>
+            <a href="#top">back to top</a>
+        </p>
+
+        <h2 id="Gotcha">
+            (Maybe) top concerns and gotchas
+        </h2>
+        <p>
+            Speaking of feedback, maybe I should have given you some heads up of
+            what is knowingly different and was a deliberate choice of our team.
+            It's not like we don't want to hear your feedback on these items
+            (quite the opposite, in fact!)
+            I just want provide some explanation in advance, so that you won't
+            think it's a bug or an oversight.
+        </p>
+
+        <h3 id="noBlue">
+            SConfig is not blue anymore
+        </h3>
+        <p>
+            Yes, the legacy SConfig had a distinctive blue background. (Have you
+            ever noticed it's a slightly different color from
+            <a href="https://www.leeholmes.com/blog/2008/06/01/powershells-noble-blue/">PowerShell-ish
+            blue</a>?)
+            It may have been familiar for many of you, but we intentionally
+            decided to give up on this. Given that SConfig is now the
+            <em>default</em> experience, it does not have to stand apart anymore.
+            Moreover, colorful backgrounds are known to cause accessibility issues.
+            For these and other reasons, the modern PowerShell (n&#233;e
+            &ldquo;PowerShell Core&rdquo;) has now black background by default, too.
+        </p>
+        <p>
+            Plus, it makes it easier to immediately make sure you're in the new
+            SConfig and not in the legacy one.
+        </p>
+
+        <h3 id="no11">
+            There's no #11 in SConfig, currently
+        </h3>
+        <p>
+            I admit, this may seem a little weird. After <strong>[10] Telemetry
+            Settings</strong> the next menu item is <strong>[12] Log off
+            user</strong>. Did we simply miss a number by mistake?
+        </p>
+        <p>
+            Not really. If you look at some of the legacy SConfig screenshots
+            above, you'll see that number <strong>11</strong> used to be a key
+            for Windows
+            Activation. There's no OS Activation in that sense for Azure Stack
+            HCI: the OS itself is a free download and free to install. (You'll
+            have to <em>register</em> it with Azure, however, to start using it
+            for hosting production VMs&mdash;and <em>pay as you go</em>.) Hence,
+            this menu item is obsolete.
+        </p>
+        <p>
+            Should we just have moved the subsequent commands one step up each,
+            to make <strong>11</strong> key for Log off, <strong>12</strong>
+            for Restart, and so on? Or should we 
+            have placed something new on number <strong>11</strong> to avoid
+            skipping a number?
+            Good questions! We seriously considered these options. However, my
+            current <em>hypothesis</em> is that there are actual people out
+            there who got used to the old SConfig in the past years. They may
+            have developed muscle memory around one or more of these keys. And 
+            if true, those people won't appreciate that if we suddenly moved their
+            cheese. E.g. if I got a habit of pressing <strong>12</strong> to Log
+            off, I would not
+            be amused if suddenly it becomes a key for Restart, and so on.
+        </p>
+        <p>
+            Am I right? Am I wrong? Was skipping the number the best decision?
+            We honestly do not know yet, and that's one of the points of writing 
+            this post. We look forward for your feedback and opinions on this, 
+            among other things.
+        </p>
+        <p>
+            <a href="#top">back to top</a>
+        </p>
+
+        <h2 id="Known">
+            Known issues in SConfig in Azure Stack HCI public preview (build 
+            17784.1068)
+        </h2>
+        <p>
+            As I said couple times already, the new SConfig in Azure Stack HCI
+            public preview is our early take. By no means we believe it's feature
+            complete or bugs free. In fact, we're already aware of some of the
+            rather unfortunate issues in the current build. Remember, it's a preview
+            release, so we have a plan of fixing all of these issues in the coming
+            months. But worth noting anyway, especially if you feel stuck or angry
+            with us.
+        </p>
+
+        <h3 id="Telemetry">
+            All languages: Telemetry says &ldquo;Unknown&rdquo; 
+            by default
+        </h3>
+        <p>
+            In fact, this is not a new issue. SConfig had always behaved this way.
+            But I understand it's quite confusing, especially around such
+            delicate topic as data collection and privacy. So wanted to call it out
+            anyway.
+        </p>
+        <p>
+            When you install any operating system, the default telemetry level
+            applies, unless you have changed it. The default for Windows Server
+            is <strong>Enhanced,</strong> while the default for Azure Stack HCI
+            is <strong>Security only.</strong> However, SConfig will show it as
+            &ldquo;Unknown,&rdquo; in either case. Once you <em>change</em> the
+            telemetry level at some point (using  SConfig or otherwise, e.g. via
+            Group Policy), SConfig will show you the actual value (even if you
+            change it back later.)
+        </p>
+
+        <h3 id="Subnet mask">
+            All languages: Cannot set static IP address when accepting default
+            value for Subnet mask
+        </h3>
+        <p>
+            If you use SConfig to set up static IP address assignment to one of
+            the network adapters, it will offer you a convenient default value
+            for Subnet mask (which is &ldquo;255.255.255.0&rdquo; or /24.) The 
+            problem is, it does not currently read this value properly, and the 
+            whole operation fails silently. Effectively, the IP address is not
+            being set.
+        </p>
+        <p> 
+            To work around this issue, always type in the Subnet
+            mask explicitly, even if you mean to set it to the same value 
+            (255.255.255.0.)
+        </p>
+
+        <h3 id="DNS Server">
+            All languages: DNS Servers may not be displayed
+        </h3>
+        <p>
+            In the same network settings area, SConfig shows you what DNS servers
+            have been configured. Except when it does not. That is, sometimes
+            this list is empty, even though the DNS Servers are configured
+            correctly.
+        </p>
+        <p>
+            As a workaround, if DNS Servers are not displayed, or the values do
+            not match what you expect them to be, check the actual settings by
+            typing
+            <a href="https://docs.microsoft.com/powershell/module/dnsclient/get-dnsclientserveraddress">
+                Get-DnsClientServerAddress
+            </a>
+            in PowerShell.
+        </p>
+
+        <h3 id="Rename">
+            All languages: Cannot rename computer using non-Latin characters
+        </h3>
+        <p>
+            When using option <strong>[2] Computer name,</strong> you cannot 
+            define a new computer name using non-Latin characters, such as
+            Cyrillic or Asian symbols. Anything except A-Z, numbers and hyphen
+            is not allowed. This behavior is consistent with
+            <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/rename-computer?view=powershell-5.1">
+            Rename-Computer</a> cmdlet.
+        </p>
+        <p>
+            As a workaround, you may use the old 
+            <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc788029(v=ws.11)">
+            Netdom</a> utility in PowerShell.
+        </p>
+
+        <h3 id="Remote management">
+            All languages, except English: Remote management value is shown as
+            &ldquo;Disabled&rdquo;
+        </h3>
+        <p>
+            As I noted before, Remote management is always enabled by default,
+            unless disabled e.g. by Group Policy. However, in non-English
+            versions, SConfig fails to display it correctly and fails back to 
+            showing &ldquo;Disabled.&rdquo; This happens even after you use
+            SConfig to configure and enable it again. No matter what you do,
+            it will always say it's disabled.
+        </p>
+        <p>
+            There are no workarounds, just be aware that remote management is in
+            fact enabled, and use it as you would normally do. If something
+            does not work, try running
+            <a href="https://docs.microsoft.com/powershell/module/microsoft.powershell.core/enable-psremoting?view=powershell-5.1">Enable-psRemoting</a>
+            in PowerShell and take action on any errors or warnings returned by this
+            cmdlet.
+        </p>
+
+        <h3 id="Localized prompt">
+            All languages, except English: the key prompts ask you for localized
+            input, but expect English input in fact
+        </h3>
+        <p>
+            This is a very unfortunate one. Imagine you've installed Azure Stack
+            HCI in French, and Logoff prompt ask you for confirmation: 
+            <em>(O)ui ou (N)on</em>. Or, the same in German: <em>(J)a oder
+            (n)ein</em>. So, naturally you should press <strong>O</strong> (in 
+            French) or <strong>J</strong> (in German) to confirm. However, this
+            does not work. In fact, you have to press <strong>Y</strong> (for 
+            English <em>Yes)</em> to proceed. This applies to any prompts
+            displayed by SCconfig. You always have to use the keys which
+            correspond to English text.
+        </p>
+        <p>
+            Unfortunately, there's no easy workaround today. You may either use 
+            English version of Azure Stack HCI for testing, and install a language
+            pack later if you prefer a localized user interface. Or quit SConfig
+            for now and use PowerShell to configure your servers. (Remember, 
+            everything SCofnig does, PowerShell does too&mdash;and much more!)
+        </p>
+
+        <h3 id="No localization">
+            Some languages: no localization
+        </h3>
+        <p>
+            Given the previous issue, it may be not a very bad thing. But anyway,
+            Azure Stack HCI preview is currently available in 12 
+            languages&mdash;which are the same languages Azure portal is
+            available in. Five
+            of them ship with localized SConfig. However, there are seven 
+            languages currently where SConfig is not yet localized. All user
+            interface is in English. Here's the list of these languages.
+        </p>
+
+        <ul>
+            <li>Czech (cs-cz)</li>
+            <li>Hungarian (hu-hu)</li>
+            <li>Dutch (nl-nl)</li>
+            <li>Polish (pl-pl)</li>
+            <li>Portuguese (pt-pt)</li>
+            <li>Swedish (sv-se)</li>
+            <li>Turkish (tr-tr)</li>
+        </ul>
+
+        <h3 id="QnA">
+            Something else does not quite work for you?
+        </h3>
+        <p>
+            These are all the known issues we're aware of right now. Is there
+            something else missing? Anything not quite working up to your
+            expectations? If you want to complain or seek for help, please 
+            head to our new <a href="http://aka.ms/HCI-QA">Q'n'A forums.</a>
+            These are specifically intended for problem reporting. If everything
+            is working as expected but you think we can do better, or want to
+            request a new feature, please use 
+            <a href="http://aka.ms/HCI-UserVoice">our UserVoice</a> for it. Thank
+            you in advance!
+        </p>
+        <p>
+            <a href="#top">back to top</a>
+        </p>
+
+        <h2 id="Windows Server">
+            Last but not least: SConfig in Windows Server
+        </h2>
+        <p>
+            This is all great, but are we going to abandon Windows Server and 
+            leave it in the limb forever with the legacy SConfig? Absolutely not!
+            We <strong>love</strong> Windows Server. It is true that Azure Stack
+            HCI did receive some exclusive new features that differentiate it
+            from Windows Server, and there will be many more. But SConfig is not
+            meant to be one of them! It's just that new SConfig
+            is not quite ready for prime time yet (as you can probably tell from
+            the list of known issues above.) Our plan is to use Azure Stack
+            HCI as our vehicle for rapid release, flush out all the details and
+            gather feedback. But the new SConfig will be part of Server Core in
+            the upcoming releases of Windows Server.
+        </p>
+        <p>
+            <a href="#top">back to top</a>
+        </p>
+    </body>
+</html>
