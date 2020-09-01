@@ -58,6 +58,8 @@ $psSession  = [System.Collections.Generic.List[
   # $Name.Add( 'ArtemP-DB-00'   )
 
   # $Name.Add( 'Kepler003'      )
+  # $Name.Add( 'Kepler004'      )
+  # $Name.Add( 'Kepler005'      )
 
   # $Name.Add( 'ArtemP-HCI-03'  )
   # $Name.Add( 'ArtemP-HCI-05'  )
@@ -125,7 +127,7 @@ $Address | ForEach-Object -Process {
             $Message = 'Explicit credentials were specified'
             Write-Message -Channel Debug -Message $Message
 
-            $ItemPath = 'wsMan:\Localhost\Client\TrustedHosts'
+         <# $ItemPath = 'wsMan:\Localhost\Client\TrustedHosts'
 
             $Item = Get-Item -Path $ItemPath
 
@@ -144,7 +146,9 @@ $Address | ForEach-Object -Process {
                 Write-Message -Channel Debug -Message $Message
 
                 $Item = Set-Item -Path $ItemPath -Value $Address[0] -Concatenate -Force -PassThru
-            }
+            }  #>
+
+            Add-wsManTrustedHost -HostName $psItem
 
             $SessionParam.Add(
                 'Credential',
@@ -156,8 +160,6 @@ $Address | ForEach-Object -Process {
                 [Microsoft.Management.Infrastructure.Options.PasswordAuthenticationMechanism]::Negotiate
             )
         }
-
-
 
         $cimSession.Add( ( New-cimSession @SessionParam ) )
         $psSession.Add(  ( New-psSession  @SessionParam ) )

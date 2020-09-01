@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend" >
+  <servicing>
+<!--  Install a selectable update in a package that is in the Windows Foundation
+      namespace  -->
+    <package action="configure">
+      <AssemblyIdentity
+          name="Microsoft-Windows-Foundation-Package"
+          publicKeyToken="31bf3856ad364e35"
+          processorArchitecture="amd64"
+          versionScope="nonSxS"
+          version="10.0.19041.1"          
+          language="neutral"
+      />
+      
+<!--  Hyper-V                                                                -->
+<!--  Provides services and management tools for creating and running virtual
+      machines and their resources.                                          -->
+      <selection name="Microsoft-Hyper-V-All"                   state="true"  />
+    <!--  Hyper-V Management Tools                                           -->
+    <!--  Includes GUI and command-line tools for managing Hyper-V.          -->
+      <selection name="Microsoft-Hyper-V-Tools-All"             state="true"  />
+        <!--  Microsoft-Hyper-V-Management-Clients                           -->
+        <!--  Includes the Hyper-V Manager snap-in and Virtual Machine 
+              Connection tool.                                               -->
+      <selection name="Microsoft-Hyper-V-Management-Clients"    state="true"  />
+        <!--  Hyper-V Module for Windows PowerShell                          -->
+        <!--  Includes Windows PowerShell cmdlets for managing Hyper-V.      -->
+      <selection name="Microsoft-Hyper-V-Management-PowerShell" state="true"  />      
+    <!--  Hyper-V Platform                                                   -->
+    <!--  Provides the services that you can use to create and manage virtual
+          machines and their resources.                                      -->
+      <selection name="Microsoft-Hyper-V"                       state="false" />
+        <!--  Hyper-V Hypervisor                                             -->
+        <!--  Provides the Hyper-V Hypervisor.                               -->
+      <selection name="Microsoft-Hyper-V-Hypervisor"            state="false" />
+        <!--  Hyper-V Services                                               -->
+        <!--  Provides the services that you can use to create and manage 
+              virtual machines and their resources.                          -->
+      <selection name="Microsoft-Hyper-V-Services"              state="false" />
+    </package>
+  </servicing>
+</unattend>

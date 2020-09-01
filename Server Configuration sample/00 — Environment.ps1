@@ -9,10 +9,10 @@
     'Hyper-V'
 )
 
-$VerbosePreference     = 'Continue'
-$DebugPreference       = 'Continue'
-$ErrorActionPreference = 'Stop'
-Set-StrictMode -Version 'latest'
+$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+$VerbosePreference     = [System.Management.Automation.ActionPreference]::Continue
+$DebugPreference       = [System.Management.Automation.ActionPreference]::Continue
+Set-StrictMode -Version 'Latest'
 
 Function
 ConvertFrom-netIpAddressPrefixLength
@@ -303,9 +303,11 @@ Write-Message
             Mandatory = $True
         )]
         [System.Management.Automation.ValidateSetAttribute(
+            'Error',
             'Information',
             'Verbose',
-            'Debug'
+            'Debug',
+            'Warning'
         )]
         [System.String]
         $Channel
@@ -341,10 +343,20 @@ Write-Message
                 $Length = 11
             }
 
+           'Warning'
+            {
+                $Length = 11
+            }
+
            'Debug'
             {
                 $Length = 13
                 $Indent++
+            }
+
+            'Error'
+            {
+                $Length = 13
             }
         }
 
@@ -359,5 +371,399 @@ Write-Message
         $Command     = "Write-$Channel"
 
       & $Command -Message $MessageEx
+    }
+}
+
+Function
+Test-Administrator
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+
+    Param(
+    
+        [System.Management.Automation.ParameterAttribute()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
+    )
+
+    Process
+    {
+        $WindowsIdentity    = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+        $WindowsPrincipal   = [System.Security.Principal.WindowsPrincipal]::new( $WindowsIdentity )
+        $WindowsBuiltInRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
+        $IsInRole           = $WindowsPrincipal.IsInRole( $WindowsBuiltInRole )
+
+        If
+        (
+            $Force
+        )
+        {
+            If
+            (
+                $IsInRole
+            )
+            {        
+              # We're good. Proceed to what we were going to do
+            }
+            Else
+            {
+                $Message = 'This script requires to be run Elevated (“as Administrator”)'
+
+                Write-Message -Channel Error -Message $Message
+            }
+        }
+        Else
+        {
+            Return $IsInRole
+        }
+    }
+}
+
+Function
+Get-wsManTrustedHost
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+
+    Param(
+    
+        [System.Management.Automation.ParameterAttribute()]
+        [System.String]
+        $ComputerName
+    )
+
+    Process
+    {
+        $InstanceParam = @{
+
+            ResourceURI = 'WinRM/Config/Client'
+        }
+
+        If
+        (
+            $ComputerName
+        )
+        {
+            $InstanceParam.Add( 'ComputerName', $ComputerName )
+        }
+
+        $Client = Get-wsManInstance @InstanceParam
+
+        Return $Client.TrustedHosts -split ','
+    }
+}
+
+Function
+Test-wsManTrustedHost
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+
+    Param(
+
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory = $True    
+        )]
+        [System.Collections.Generic.List[System.String]]
+        $HostName
+    ,
+        [System.Management.Automation.ParameterAttribute()]
+        [System.String]
+        $ComputerName
+    ,
+        [System.Management.Automation.ParameterAttribute()]
+        [System.Management.Automation.SwitchParameter]
+        $noMatch
+    )
+
+    Process
+    {
+        $HostParam = @{}
+
+        If
+        (
+            $ComputerName
+        )
+        {
+            $HostParam.Add( 'ComputerName', $ComputerName )
+        }
+
+        $HostCurrent = Get-wsManTrustedHost @HostParam
+
+        If
+        (
+            $noMatch
+        )
+        {
+            $FilterScript = { $psItem -notIn $HostCurrent }
+        }
+        Else
+        {
+            $FilterScript = { $psItem    -In $HostCurrent }
+        }
+
+        Return $HostName | Where-Object -FilterScript $FilterScript
+    }
+}
+
+Function
+Set-wsManTrustedHost
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+
+    Param(
+
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory = $True    
+        )]
+        [System.Collections.Generic.List[System.String]]
+        $HostName
+    ,    
+        [System.Management.Automation.ParameterAttribute()]
+        [System.String]
+        $ComputerName
+    )
+
+    Process
+    {
+        $ValueSet = @{
+
+            TrustedHosts = $HostName -join ','
+        }
+
+        $InstanceParam = @{
+
+            ResourceURI = 'WinRM/Config/Client'
+            ValueSet    = $ValueSet
+        }
+
+        If
+        (
+            $ComputerName
+        )
+        {
+            $InstanceParam.Add( 'ComputerName', $ComputerName )
+        }
+        Else
+        {
+            Test-Administrator -Force
+        }
+
+        [System.Void]( Set-wsManInstance @InstanceParam )
+    }
+}
+
+Function
+Add-wsManTrustedHost
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+
+    Param(
+
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory = $True    
+        )]
+        [System.Collections.Generic.List[System.String]]
+        $HostName
+    ,    
+        [System.Management.Automation.ParameterAttribute()]
+        [System.String]
+        $ComputerName
+    )
+
+    Process
+    {
+        $HostParam = @{
+
+            'HostName' = $HostName
+            'noMatch'  = $True
+        }
+
+        If
+        (
+            $ComputerName
+        )
+        {
+            $HostParam.Add( 'ComputerName', $ComputerName )
+        }
+            
+        $HostAdd = Test-wsManTrustedHost @HostParam
+
+        If
+        (
+            $HostAdd
+        )
+        {
+            $HostParam = @{}
+
+            If
+            (
+                $ComputerName
+            )
+            {
+                $HostParam.Add( 'ComputerName', $ComputerName )
+            }
+
+            $HostCurrent = Get-wsManTrustedHost @HostParam
+
+            $HostSet = $HostCurrent + $HostAdd
+
+            $HostParam.Add( 'HostName', $HostSet )
+
+            Set-wsManTrustedHost @HostParam
+        }
+        Else
+        {
+            $Message = 'All specified values are already in Trusted Hosts'
+            Write-Message -Channel Debug -Message $Message
+        }
+    }
+}
+
+Function
+Remove-wsManTrustedHost
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+
+    Param(
+
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory = $True    
+        )]
+        [System.Collections.Generic.List[System.String]]
+        $HostName
+    ,    
+        [System.Management.Automation.ParameterAttribute()]
+        [System.String]
+        $ComputerName
+    )
+
+    Process
+    {
+        $HostParam = @{
+
+            'HostName' = $HostName
+          # 'noMatch'  = $True
+        }
+
+        If
+        (
+            $ComputerName
+        )
+        {
+            $HostParam.Add( 'ComputerName', $ComputerName )
+        }
+            
+        $HostRemove = Test-wsManTrustedHost @HostParam
+
+        If
+        (
+            $HostRemove
+        )
+        {
+            $HostParam = @{}
+
+            If
+            (
+                $ComputerName
+            )
+            {
+                $HostParam.Add( 'ComputerName', $ComputerName )
+            }
+
+            $HostCurrent = Get-wsManTrustedHost @HostParam
+
+            $HostSet = $HostCurrent | Where-Object -FilterScript {
+
+                $psItem -notIn $HostRemove
+            }
+
+            $HostParam.Add( 'HostName', $HostSet )
+
+            Set-wsManTrustedHost @HostParam
+        }
+        Else
+        {
+            $Message = 'None of the specified values are in Trusted Hosts'
+            Write-Message -Channel Debug -Message $Message
+        }
+    }
+}
+
+Function
+Get-ServiceEx
+{
+    [System.Management.Automation.CmdletBindingAttribute()]
+
+    Param(
+
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory = $True    
+        )]
+        [System.Collections.Generic.List[System.String]]
+        $Name
+    ,
+        [System.Management.Automation.ParameterAttribute()]
+        [System.Collections.Generic.List[System.String]]
+        $ComputerName
+    ,
+        [System.Management.Automation.ParameterAttribute()]
+        [System.Management.Automation.psCredential]
+        $Credential
+    )
+
+    Process
+    {
+        If
+        (
+            $Credential
+        )
+        {
+            $Mapping = [System.Collections.Generic.List[
+                Microsoft.Management.Infrastructure.CimInstance
+            ]]::new()
+
+            $ComputerName | ForEach-Object -Process {
+
+                $MappingParam = @{
+                    
+                    RemotePath = "\\$psItem\ipc$"
+                    UserName   = $Credential.GetNetworkCredential().UserName
+                    Password   = $Credential.GetNetworkCredential().Password
+                }
+                $Mapping.Add( ( New-SmbMapping @MappingParam ) )
+            }
+        }
+
+        $ServiceParam = @{ 
+
+            Name = $Name
+        }
+
+        If
+        (
+            $ComputerName
+        )
+        {
+            $ServiceParam.Add(
+                'ComputerName',
+                $ComputerName
+            )
+        }
+
+        [System.Collections.Generic.List[
+            System.ServiceProcess.ServiceController
+        ]]$Service = Get-Service @ServiceParam
+
+        If
+        (
+            $Credential
+        )
+        {
+          # This always returns “Invalid parameter” error
+          # Remove-SmbMapping -InputObject $Mapping
+
+            Remove-SmbMapping -RemotePath $Mapping.RemotePath -Confirm:$False
+        }
+
+        Return $Service
     }
 }

@@ -6,7 +6,9 @@
 
     $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1015.200511-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1015.amd64fre.rs5_release_svc_hci.200511-1900_server_serverazurestackhcicor_en-us.vhdx'  #>
 
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1048.200616-1043\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1048.amd64fre.rs5_release_svc_hci.200616-1043_server_serverazurestackhcicor_en-us.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1048.200616-1043\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1048.amd64fre.rs5_release_svc_hci.200616-1043_server_serverazurestackhcicor_en-us.vhdx'
+
+    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\vb_release\19041.1.191206-1406\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\19041.1.amd64fre.vb_release.191206-1406_server_serverdatacenteracore_en-us_vl.vhdx'
 
     $DomainName       = 'ntDev.corp.Microsoft.com'
     $Password         = 'P@ssw0rd.123'
@@ -58,8 +60,11 @@ $psSession | ForEach-Object -Process {
         $psItem.ComputerName -eq $AddressCurrent
     }    
 
-    $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Starting upgrade for `“$AddressCurrent`”"
-    Write-Verbose -Message $Message
+ <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Starting upgrade for `“$AddressCurrent`”"
+    Write-Verbose -Message $Message  #>
+
+    $Message = "Starting upgrade for `“$AddressCurrent`”"
+    Write-Message -Channel Verbose -Message $Message
 
   # Check if the server already runs the target image
 
@@ -73,48 +78,62 @@ $psSession | ForEach-Object -Process {
         ( Split-Path -Path $Disk.Location -Leaf ) -eq $Source.Name    
     )
     {
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Server already runs the target image `“$($Source.BaseName)`”. Skipping"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Server already runs the target image `“$($Source.BaseName)`”. Skipping"
+        Write-Verbose -Message $Message  #>
+
+        $Message = "Server already runs the target image `“$($Source.BaseName)`”. Skipping"
+        Write-Message -Channel Verbose -Message $Message
     }
     Else
     {
-      # Check cluster membership and remove node if needed
-
-        $Computer = Get-adComputer -Identity $NameCurrent -Properties 'servicePrincipalName'
-
         If
         (
-            $Computer.servicePrincipalName | Where-Object -FilterScript {
-                $psItem -like 'msServerClusterMgmtAPI/*'
-            }
+            Test-Path -Path 'variable:\Credential'
         )
         {
-            $Service = Get-Service -ComputerName $AddressCurrent -Name 'clusSvc'
+            $Message = 'Non-domain server, skipping cluster checks'
+            Write-Message -Channel Debug -Message $Message
+        }
+        Else
+        {
+          # Check cluster membership and remove node if needed 
+
+            $Computer = Get-adComputer -Identity $NameCurrent -Properties 'servicePrincipalName'
 
             If
             (
-                $Service.Status -eq [System.ServiceProcess.ServiceControllerStatus]::Running
+                $Computer.servicePrincipalName | Where-Object -FilterScript {
+                    $psItem -like 'msServerClusterMgmtAPI/*'
+                }
             )
             {
-                $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Removing cluster node"
-                Write-Verbose -Message $Message
+                $Service = Get-Service -ComputerName $AddressCurrent -Name 'clusSvc'
 
-                $Cluster = Get-Cluster -Name $AddressCurrent
-                $Node    = Get-ClusterNode -InputObject $Cluster -Name $NameCurrent
+                If
+                (
+                    $Service.Status -eq [System.ServiceProcess.ServiceControllerStatus]::Running
+                )
+                {
+                    $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Removing cluster node"
+                    Write-Verbose -Message $Message
 
-                $NodeParam = @{
+                    $Cluster = Get-Cluster -Name $AddressCurrent
+                    $Node    = Get-ClusterNode -InputObject $Cluster -Name $NameCurrent
 
-                    InputObject                   = $Node
-                    IgnoreStorageConnectivityLoss = $True
-                    Force                         = $True
-                    Verbose                       = $False
+                    $NodeParam = @{
+
+                        InputObject                   = $Node
+                        IgnoreStorageConnectivityLoss = $True
+                        Force                         = $True
+                        Verbose                       = $False
+                    }
+                    $Node    = Remove-ClusterNode @NodeParam
                 }
-                $Node    = Remove-ClusterNode @NodeParam
-            }
-            Else
-            {
-                $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Cluster service is stopped. Skipping cluster membership steps"
-                Write-Verbose -Message $Message
+                Else
+                {
+                    $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Cluster service is stopped. Skipping cluster membership steps"
+                    Write-Verbose -Message $Message
+                }
             }
         }
 
@@ -172,8 +191,11 @@ $psSession | ForEach-Object -Process {
 
       # Copy disk and mount it
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Copying the disk"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Copying the disk"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Copying the disk'
+        Write-Message -Channel Debug -Message $Message
 
         $ItemParam = @{
 
@@ -205,8 +227,11 @@ $psSession | ForEach-Object -Process {
             'Windows\System32\Config\System'
         )
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Setting disk to not expand on boot"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Setting disk to not expand on boot"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Setting disk to not expand on boot'
+        Write-Message -Channel Debug -Message $Message
 
         $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
 
@@ -230,8 +255,11 @@ $psSession | ForEach-Object -Process {
             'Windows'
         )
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Setting boot target to the new image"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Setting boot target to the new image"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Setting boot target to the new image'
+        Write-Message -Channel Debug -Message $Message
 
         $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
         
@@ -240,21 +268,48 @@ $psSession | ForEach-Object -Process {
 
       # Prepare answer file for OS specialization
 
-        $odjPath = Join-Path -Path $env:Temp -ChildPath $NameCurrent
+        If
+        (
+            Test-Path -Path 'variable:\Credential'
+        )
+        {
+            $xml = @"
+<?xml version="1.0" encoding="utf-8"?>
+  <!--  Sample Answer file to automate minimal viable manageable configuration
+        Last edit 2020-03-03 by Artem Pronichkin
+        For explanation please see https://pronichkin.com -->
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+  <settings pass="offlineServicing">
+    <component name="Microsoft-Windows-Shell-Setup"
+               processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <ComputerName>$NameCurrent</ComputerName>
+      <OfflineUserAccounts>
+        <OfflineAdministratorPassword>
+          <Value>$PasswordBase64</Value>
+          <PlainText>false</PlainText>
+        </OfflineAdministratorPassword>
+      </OfflineUserAccounts>        
+    </component>
+  </settings>
+</unattend>
+"@
+        }
+        Else
+        {
+            $odjPath = Join-Path -Path $env:Temp -ChildPath $NameCurrent
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Requesting Offline Domain Join"
-        Write-Verbose -Message $Message
+         <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Requesting Offline Domain Join"
+            Write-Verbose -Message $Message  #>
 
-        $dJoin = dJoin.exe /Provision /Reuse /Domain "$DomainName" /Machine "$NameCurrent" /Reuse /PrintBlob /SaveFile $odjPath
+            $Message = 'Requesting Offline Domain Join'
+            Write-Message -Channel Debug -Message $Message
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Creating answer file"
-        Write-Verbose -Message $Message
-
-        $Temp = Invoke-Command -Session $psSessionCurrent -ScriptBlock { $env:Temp }
-
-        $AnswerPath = Join-Path -Path $Temp -ChildPath 'Unattend.xml'
-
-        $xml = @"
+            $dJoin = dJoin.exe /Provision /Reuse /Domain "$DomainName" /Machine "$NameCurrent" /Reuse /PrintBlob /SaveFile $odjPath
+        
+            $xml = @"
 <?xml version="1.0" encoding="utf-8"?>
   <!--  Sample Answer file to automate minimal viable manageable configuration
         Last edit 2020-03-03 by Artem Pronichkin
@@ -293,19 +348,33 @@ $psSession | ForEach-Object -Process {
     </component>
   </settings>
 </unattend>
-"@
+"@        
+        }
+
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Creating answer file"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Creating answer file'
+        Write-Message -Channel Debug -Message $Message
+
+        $Temp = Invoke-Command -Session $psSessionCurrent -ScriptBlock { $env:Temp }
+
+        $AnswerPath = Join-Path -Path $Temp -ChildPath 'Unattend.xml'
 
       # Apply the answer file
 
-        Invoke-Command -Session $psSessionCurrent -ScriptBlock {
+        $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
 
             $xmlDocument = [System.Xml.XmlDocument]::new()
             $xmlDocument.LoadXml( $using:xml )
             $xmlDocument.Save( $using:AnswerPath )
         }
     
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Applying the answer file"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Applying the answer file"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Applying the answer file'
+        Write-Message -Channel Debug -Message $Message
 
         $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
 
@@ -318,10 +387,19 @@ $psSession | ForEach-Object -Process {
         
         $DiskImage = Dismount-DiskImage -InputObject $DiskImage
 
-        Remove-Item -Path $odjPath
+        If
+        (
+            Test-Path -Path 'variable:\odjPath'
+        )
+        {
+            Remove-Item -Path $odjPath
+        }
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restarting"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restarting"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Restarting'
+        Write-Message -Channel Debug -Message $Message
 
         Invoke-Command -Session $psSessionCurrent -ScriptBlock {
     
@@ -332,8 +410,11 @@ $psSession | ForEach-Object -Process {
 
       # Wait for restart
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Waiting for HTTP"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Waiting for HTTP"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Waiting for HTTP'
+        Write-Message -Channel Debug -Message $Message
 
         $ConnectionParam = @{
 
@@ -355,15 +436,62 @@ $psSession | ForEach-Object -Process {
             $Test = Test-NetConnection @ConnectionParam
         }
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Waiting for WinRM"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Waiting for WinRM"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Waiting for WinRM'
+        Write-Message -Channel Debug -Message $Message
 
         $wsManParam = @{
         
-            ComputerName   = $AddressCurrent
-            Authentication = [Microsoft.WSMan.Management.AuthenticationMechanism]::Kerberos
+            ComputerName   = $AddressCurrent            
             ErrorAction    = [System.Management.Automation.ActionPreference]::SilentlyContinue
         }
+
+        $SessionParam = @{
+
+            ComputerName   = $AddressCurrent
+            Verbose        = $False
+        }
+
+        If
+        (
+            Test-Path -Path 'variable:\Credential'
+        )
+        {
+            $wsManParam.Add(
+                'Authentication',
+                [Microsoft.wsMan.Management.AuthenticationMechanism]::Negotiate
+            )
+
+            $wsManParam.Add(
+                'Credential',
+                $Credential
+            )
+
+            $SessionParam.Add(
+                'Authentication',
+                [Microsoft.Management.Infrastructure.Options.PasswordAuthenticationMechanism]::Negotiate
+            )
+
+            $SessionParam.Add(
+                'Credential',
+                $Credential
+            )
+        }
+        Else
+        {
+            $wsManParam.Add(
+                'Authentication',
+                [Microsoft.wsMan.Management.AuthenticationMechanism]::Kerberos
+            )
+
+            $SessionParam.Add(
+                'Authentication',
+                [Microsoft.wsMan.Management.AuthenticationMechanism]::Kerberos
+            )
+        }
+
         $Test = Test-wsMan @wsManParam
 
         While
@@ -375,43 +503,58 @@ $psSession | ForEach-Object -Process {
             Start-Sleep -Seconds 3
 
             $Test = Test-wsMan @wsManParam
-        }
-    
-        $SessionParam = @{
+        }    
 
-            ComputerName = $AddressCurrent
-            Verbose      = $False
-        }
         $psSessionCurrent  = New-psSession  @SessionParam
         $cimSessionCurrent = New-cimSession @SessionParam
 
       # Restore network settings
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Installing driver"
-        Write-Verbose -Message $Message
-
-      # $Name = 'TBT_WIN10_64_DCH_58'
-        $Name = 'Thunderbolt_Win10_Version-66'
-
-        $ItemParam = @{
-
-            Path        = "$($env:UserProfile)\Downloads\$Name.zip"
-            ToSession   = $psSessionCurrent
-            Destination = $Temp
+        $InstanceParam = @{
+            
+            CimSession = $cimSessionCurrent
+            ClassName  = 'win32_ComputerSystem'
+            Verbose    = $False
         }
-        Copy-Item @ItemParam
+        $Instance = Get-CimInstance @InstanceParam
 
-        $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
+        If
+        (
+            $Instance.Model -eq 'Kepler 47'
+        )
+        {
+         <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Installing driver"
+            Write-Verbose -Message $Message  #>
 
-            Set-Location -Path $using:Temp
+            $Message = 'Installing driver'
+            Write-Message -Channel Debug -Message $Message
 
-            Expand-Archive -Path ".\$($using:Name).zip" -Force
+          # $Name = 'TBT_WIN10_64_DCH_58'
+            $Name = 'Thunderbolt_Win10_Version-66'
 
-            pnputil.exe /Add-Driver ".\$($using:Name)\*.inf" /Install
+            $ItemParam = @{
+
+                Path        = "$($env:UserProfile)\Downloads\$Name.zip"
+                ToSession   = $psSessionCurrent
+                Destination = $Temp
+            }
+            Copy-Item @ItemParam
+
+            $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
+
+                Set-Location -Path $using:Temp
+
+                Expand-Archive -Path ".\$($using:Name).zip" -Force
+
+                pnputil.exe /Add-Driver ".\$($using:Name)\*.inf" /Install
+            }
         }
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restoring Static IP Address"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restoring Static IP Address"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Restoring Static IP Address'
+        Write-Message -Channel Debug -Message $Message
 
         $ipAddressRestore = [System.Collections.Generic.List[
             Microsoft.Management.Infrastructure.CimInstance
@@ -448,8 +591,11 @@ $psSession | ForEach-Object -Process {
 
       # Changing feature state
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Modifying feature"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Modifying feature"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Modifying feature'
+        Write-Message -Channel Debug -Message $Message
 
         $FeatureName.GetEnumerator() | ForEach-Object -Process {
 
@@ -474,10 +620,35 @@ $psSession | ForEach-Object -Process {
             $Command.RestartNeeded
         )
         {
-            $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restarting"
-            Write-Verbose -Message $Message
+         <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restarting"
+            Write-Verbose -Message $Message  #>
 
-            Restart-Computer -ComputerName $AddressCurrent -Wait -Protocol 'wsMan' -Force
+            $Message = 'Restarting'
+            Write-Message -Channel Debug -Message $Message
+
+            $ComputerParam = @{
+    
+                ComputerName = $AddressCurrent
+                Protocol     = 'wsMan'
+                Wait         = $True
+                Force        = $True
+            }
+
+            If
+            (
+                Test-Path -Path 'variable:\Credential'
+            )
+            {
+                $ComputerParam.Add(
+                    'wsmanAuthentication', 'Negotiate'
+                )
+        
+                $ComputerParam.Add(
+                    'Credential',          $Credential
+                )
+            }
+
+            Restart-Computer @ComputerParam
 
             $psSessionCurrent  = New-psSession  @SessionParam
             $cimSessionCurrent = New-cimSession @SessionParam
@@ -490,17 +661,29 @@ $psSession | ForEach-Object -Process {
             Test-Path -Path 'Variable:\Cluster'
         )
         {
-            $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Adding cluster node"
-            Write-Verbose -Message $Message
+         <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Adding cluster node"
+            Write-Verbose -Message $Message  #>
 
-                $Node    = Add-ClusterNode -Name $NameCurrent -InputObject $Cluster
+            $Message = 'Adding cluster node'
+            Write-Message -Channel Debug -Message $Message
+
+            $Node    = Add-ClusterNode -Name $NameCurrent -InputObject $Cluster
         }
 
-        $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Machine `“$AddressCurrent`” upgraded successfully"
-        Write-Verbose -Message $Message
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Machine `“$AddressCurrent`” upgraded successfully"
+        Write-Verbose -Message $Message  #>
+
+        $Message = "Machine `“$AddressCurrent`” upgraded successfully"
+        Write-Message -Channel Verbose -Message $Message
     }
 }
 
-$Cluster = Update-ClusterFunctionalLevel -InputObject $Cluster -Force -Verbose:$False
+If
+(
+    Test-Path -Path 'Variable:\Cluster'
+)
+{
+    $Cluster = Update-ClusterFunctionalLevel -InputObject $Cluster -Force -Verbose:$False
+}
 
 #endregion Code
