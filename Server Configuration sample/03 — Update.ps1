@@ -16,14 +16,19 @@ $Service = Invoke-Command -Session $psSession -ScriptBlock {
     $VerbosePreference     = $Using:VerbosePreference
     $DebugPreference       = $Using:DebugPreference    
 
-    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable
+    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable -Verbose:$False
 
     If
     (
         $Module
     )
     {
+      # “Import-Module” will emit verbose output even despite “-Verbose:$False”
+        $VerbosePreference     = [System.Management.Automation.ActionPreference]::SilentlyContinue
+
         Import-Module -ModuleInfo $Module -Verbose:$False
+
+        $VerbosePreference     = $Using:VerbosePreference
 
         [System.Tuple[System.Boolean]]$False
     }
@@ -197,7 +202,7 @@ $Install = Invoke-Command -Session $psSession -ScriptBlock {
     $VerbosePreference     = $Using:VerbosePreference
     $DebugPreference       = $Using:DebugPreference    
 
-    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable
+    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable -Verbose:$False
 
     If
     (

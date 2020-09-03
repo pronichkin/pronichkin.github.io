@@ -13,9 +13,3 @@ While
     Start-Sleep -Seconds 15
     Clear-DnsClientCache
 }
-
-$ClusterNetwork = Get-ClusterNetwork -InputObject $Cluster | Where-Object -FilterScript {
-    $psItem.Role -eq [Microsoft.FailoverClusters.PowerShell.ClusterNetworkRole]::ClusterAndClient
-}
-
-$ClusterNetwork.Name = $Cluster.Domain

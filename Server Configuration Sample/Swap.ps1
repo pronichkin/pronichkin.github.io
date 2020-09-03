@@ -1,14 +1,16 @@
 #region Data
 
- <# $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17784.1004.200414-2230\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1004.amd64fre.rs5_release_svc_hci_prod1.200414-2230_server_serverazurestackhcicor_en-us.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\vb_release\19041.1.191206-1406\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\19041.1.amd64fre.vb_release.191206-1406_server_serverdatacenteracore_en-us_vl.vhdx'
 
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17763.1098.200409-1700\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17763.1098.amd64fre.rs5_release_svc_hci_prod1.200409-1700_server_serverazurestackhcicor_en-us.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17763.1098.200409-1700\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17763.1098.amd64fre.rs5_release_svc_hci_prod1.200409-1700_server_serverazurestackhcicor_en-us.vhdx'
 
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1015.200511-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1015.amd64fre.rs5_release_svc_hci.200511-1900_server_serverazurestackhcicor_en-us.vhdx'  #>
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17784.1004.200414-2230\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1004.amd64fre.rs5_release_svc_hci_prod1.200414-2230_server_serverazurestackhcicor_en-us.vhdx'
+
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1015.200511-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1015.amd64fre.rs5_release_svc_hci.200511-1900_server_serverazurestackhcicor_en-us.vhdx'
 
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1048.200616-1043\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1048.amd64fre.rs5_release_svc_hci.200616-1043_server_serverazurestackhcicor_en-us.vhdx'
 
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\vb_release\19041.1.191206-1406\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\19041.1.amd64fre.vb_release.191206-1406_server_serverdatacenteracore_en-us_vl.vhdx'
+    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_en-us.vhdx'
 
     $DomainName       = 'ntDev.corp.Microsoft.com'
     $Password         = 'P@ssw0rd.123'
@@ -123,6 +125,18 @@ $psSession | ForEach-Object -Process {
                     $NodeParam = @{
 
                         InputObject                   = $Node
+                        Drain                         = $True
+                        ForceDrain                    = $True
+                        RetryDrainOnFailure           = $True
+                        AvoidPlacement                = $False
+                        Wait                          = $True
+                        Verbose                       = $False
+                    }
+                    $Node    = Suspend-ClusterNode @NodeParam
+
+                    $NodeParam = @{
+
+                        InputObject                   = $Node
                         IgnoreStorageConnectivityLoss = $True
                         Force                         = $True
                         Verbose                       = $False
@@ -179,6 +193,47 @@ $psSession | ForEach-Object -Process {
             }
         }
 
+      # Store Virtual Switch information to be restored later
+
+        $Switch = [System.Collections.Generic.Dictionary[
+            System.String,
+            System.Collections.Generic.List[
+                System.Net.NetworkInformation.PhysicalAddress
+            ]
+        ]]::new()
+
+        $SwitchParam = @{
+
+            CimSession = $cimSessionCurrent
+            SwitchType = [Microsoft.HyperV.PowerShell.vmSwitchType]::External
+        }
+        Get-vmSwitch @SwitchParam | ForEach-Object -Process {
+
+            $SwitchCurrent = $psItem
+
+            $PhysicalAddress = [System.Collections.Generic.List[
+                System.Net.NetworkInformation.PhysicalAddress
+            ]]::new()
+
+            $AdapterParam = @{
+            
+                CimSession           = $cimSessionCurrent
+                InterfaceDescription = $SwitchCurrent.NetAdapterInterfaceDescriptions
+                Verbose              = $False
+            }
+            Get-NetAdapter @AdapterParam | ForEach-Object -Process {
+
+                $PhysicalAddressCurrent = [System.Net.NetworkInformation.PhysicalAddress]::Parse( $psItem.MacAddress )
+
+                $PhysicalAddress.Add( $PhysicalAddressCurrent )
+            }
+
+            $Switch.Add( 
+                $SwitchCurrent.Name,
+                $PhysicalAddress
+            )
+        }
+
       # Locate target (physical disk)
 
         $Disk = Get-Disk -cimSession $cimSessionCurrent | Where-Object -FilterScript {
@@ -206,7 +261,12 @@ $psSession | ForEach-Object -Process {
         }
         Copy-Item @ItemParam
 
-        $Path = Join-Path -Path $Partition.AccessPaths[0] -ChildPath $Source.Name
+     <# Join-Path fails if local machine does not have a disk with the same drive
+        letter
+
+        $Path = Join-Path -Path $Partition.AccessPaths[0] -ChildPath $Source.Name  #>
+
+        $Path = [System.IO.Path]::Combine( $Partition.AccessPaths[0], $Source.Name )
 
         $DiskImage = Get-DiskImage -cimSession $cimSessionCurrent -ImagePath $Path
 
@@ -448,7 +508,13 @@ $psSession | ForEach-Object -Process {
             ErrorAction    = [System.Management.Automation.ActionPreference]::SilentlyContinue
         }
 
-        $SessionParam = @{
+        $psSessionParam = @{
+
+            ComputerName   = $AddressCurrent
+          # Verbose        = $False
+        }
+
+        $cimSessionParam = @{
 
             ComputerName   = $AddressCurrent
             Verbose        = $False
@@ -469,12 +535,22 @@ $psSession | ForEach-Object -Process {
                 $Credential
             )
 
-            $SessionParam.Add(
+            $psSessionParam.Add(
+                'Authentication',
+                [System.Management.Automation.Runspaces.AuthenticationMechanism]::Negotiate
+            )
+
+            $psSessionParam.Add(
+                'Credential',
+                $Credential
+            )            
+            
+            $cimSessionParam.Add(
                 'Authentication',
                 [Microsoft.Management.Infrastructure.Options.PasswordAuthenticationMechanism]::Negotiate
             )
 
-            $SessionParam.Add(
+            $cimSessionParam.Add(
                 'Credential',
                 $Credential
             )
@@ -486,9 +562,14 @@ $psSession | ForEach-Object -Process {
                 [Microsoft.wsMan.Management.AuthenticationMechanism]::Kerberos
             )
 
-            $SessionParam.Add(
+            $psSessionParam.Add(
                 'Authentication',
-                [Microsoft.wsMan.Management.AuthenticationMechanism]::Kerberos
+                [System.Management.Automation.Runspaces.AuthenticationMechanism]::Kerberos
+            )
+
+            $cimSessionParam.Add(
+                'Authentication',
+                [Microsoft.Management.Infrastructure.Options.PasswordAuthenticationMechanism]::Kerberos
             )
         }
 
@@ -505,10 +586,10 @@ $psSession | ForEach-Object -Process {
             $Test = Test-wsMan @wsManParam
         }    
 
-        $psSessionCurrent  = New-psSession  @SessionParam
-        $cimSessionCurrent = New-cimSession @SessionParam
+        $psSessionCurrent  = New-psSession  @psSessionParam
+        $cimSessionCurrent = New-cimSession @cimSessionParam
 
-      # Restore network settings
+      # Install driver
 
         $InstanceParam = @{
             
@@ -532,9 +613,21 @@ $psSession | ForEach-Object -Process {
           # $Name = 'TBT_WIN10_64_DCH_58'
             $Name = 'Thunderbolt_Win10_Version-66'
 
+            $Path = Join-Path -Path $env:Temp -ChildPath "$Name.zip"
+
+            $RequestParam = @{
+                
+                UseBasicParsing = $True
+                Uri             = "https://downloadmirror.intel.com/28735/eng/$Name.zip"
+                OutFile         = $Path
+                PassThru        = $True
+                Verbose         = $False
+            }
+            $Request = Invoke-WebRequest @RequestParam
+
             $ItemParam = @{
 
-                Path        = "$($env:UserProfile)\Downloads\$Name.zip"
+                Path        = $Path
                 ToSession   = $psSessionCurrent
                 Destination = $Temp
             }
@@ -544,48 +637,9 @@ $psSession | ForEach-Object -Process {
 
                 Set-Location -Path $using:Temp
 
-                Expand-Archive -Path ".\$($using:Name).zip" -Force
+                Expand-Archive -Path ".\$($using:Name).zip" -Force -Verbose:$False
 
                 pnputil.exe /Add-Driver ".\$($using:Name)\*.inf" /Install
-            }
-        }
-
-     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restoring Static IP Address"
-        Write-Verbose -Message $Message  #>
-
-        $Message = 'Restoring Static IP Address'
-        Write-Message -Channel Debug -Message $Message
-
-        $ipAddressRestore = [System.Collections.Generic.List[
-            Microsoft.Management.Infrastructure.CimInstance
-        ]]::new()
-
-        $ipAddress.GetEnumerator() | ForEach-Object -Process {
-
-            $PhysicalAddress = $psItem.Key
-
-            $netAdapterCurrent = Get-NetAdapter -cimSession $cimSessionCurrent | Where-Object -FilterScript {
-
-                [System.Net.NetworkInformation.PhysicalAddress]::Parse( $psItem.MacAddress ) -eq $PhysicalAddress
-            }
-
-            If
-            (
-                $netAdapterCurrent
-            )
-            {
-                $AddressParam = @{
-                
-                    cimSession     = $cimSessionCurrent
-                    InterfaceAlias = $netAdapterCurrent.Name
-                    IPAddress      = $psItem.Value.ipAddress
-                    PrefixLength   = $psItem.Value.PrefixLength
-                    Verbose        = $False
-                    Debug          = $False
-                }
-                New-NetIPAddress @AddressParam | ForEach-Object -Process {
-                    $ipAddressRestore.Add( $psItem )
-                }
             }
         }
 
@@ -650,8 +704,87 @@ $psSession | ForEach-Object -Process {
 
             Restart-Computer @ComputerParam
 
-            $psSessionCurrent  = New-psSession  @SessionParam
-            $cimSessionCurrent = New-cimSession @SessionParam
+            $psSessionCurrent  = New-psSession  @psSessionParam
+            $cimSessionCurrent = New-cimSession @cimSessionParam
+        }
+
+      # Restore network settings
+
+        $Message = 'Restoring Virtual Switch'
+        Write-Message -Channel Debug -Message $Message
+
+        $SwitchRestore = [System.Collections.Generic.List[
+            Microsoft.HyperV.PowerShell.vmSwitch
+        ]]::new()
+
+        $Switch.GetEnumerator() | ForEach-Object -Process {
+
+            $SwitchCurrent = $psItem
+
+            $AdapterParam = @{
+                
+                CimSession = $cimSessionCurrent
+                Physical   = $True
+                Verbose    = $False
+            }
+            $Adapter = Get-NetAdapter @AdapterParam | Where-Object -FilterScript {
+                $psItem.MacAddress -in $SwitchCurrent.Value
+            }
+
+            $SwitchParam = @{
+                
+                Name                           = $SwitchCurrent.Key
+                NetAdapterInterfaceDescription = $Adapter.InterfaceDescription
+                AllowManagementOS              = $True
+                MinimumBandwidthMode           = [Microsoft.HyperV.PowerShell.vmSwitchBandwidthMode]::None
+                EnableEmbeddedTeaming          = $True
+                CimSession                     = $cimSessionCurrent
+            }
+            $SwitchRestore.Add( ( New-vmSwitch @SwitchParam ) )
+        }
+
+     <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Restoring Static IP Address"
+        Write-Verbose -Message $Message  #>
+
+        $Message = 'Restoring Static IP Address'
+        Write-Message -Channel Debug -Message $Message
+
+        $ipAddressRestore = [System.Collections.Generic.List[
+            Microsoft.Management.Infrastructure.CimInstance
+        ]]::new()
+
+        $ipAddress.GetEnumerator() | ForEach-Object -Process {
+
+            $PhysicalAddress = $psItem.Key
+
+         <# This does not work as designed for Thunderbolt adapters because
+            apparently they use a different MAC address each time. However, this
+            does not block the upgrade. Hence, the current solution is to assign
+            static IP addresses manually afterwards, or using a separate script  #>
+
+            $netAdapterCurrent = Get-NetAdapter -cimSession $cimSessionCurrent | Where-Object -FilterScript {
+
+                [System.Net.NetworkInformation.PhysicalAddress]::Parse( $psItem.MacAddress ) -eq $PhysicalAddress
+            }
+
+            If
+            (
+                $netAdapterCurrent
+            )
+            {
+                $AddressParam = @{
+                
+                    cimSession     = $cimSessionCurrent
+                    InterfaceAlias = $netAdapterCurrent.Name
+                    IPAddress      = $psItem.Value.ipAddress
+                    PrefixLength   = $psItem.Value.PrefixLength
+                    Verbose        = $False
+                    Debug          = $False
+                }
+                New-NetIPAddress @AddressParam | ForEach-Object -Process {
+                    $ipAddressRestore.Add( $psItem )
+                }
+            }
         }
 
       # Add the node back to the cluster
@@ -668,6 +801,17 @@ $psSession | ForEach-Object -Process {
             Write-Message -Channel Debug -Message $Message
 
             $Node    = Add-ClusterNode -Name $NameCurrent -InputObject $Cluster
+
+            While
+            (
+                Get-StorageJob -CimSession $cimSessionCurrent
+            )
+            {
+                $Message = 'Waiting for storage jobs to complete'
+                Write-Message -Channel Debug -Message $Message
+
+                Start-Sleep -Seconds 60
+            }
         }
 
      <# $Message = "$((Get-Date).ToUniversalTime().ToLongTimeString())    Machine `“$AddressCurrent`” upgraded successfully"
