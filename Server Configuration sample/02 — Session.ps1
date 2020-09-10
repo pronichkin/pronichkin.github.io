@@ -58,9 +58,11 @@ $psSession  = [System.Collections.Generic.List[
   # $Name.Add( 'ArtemP-DB-00'    )
 
   # $Name.Add( 'Kepler003'       )
-    $Name.Add( 'Kepler004'       )
-    $Name.Add( 'Kepler005'       )
+  # $Name.Add( 'Kepler004'       )
+  # $Name.Add( 'Kepler005'       )
 
+  # $Name.Add( 'ArtemP-HCI-01'   )
+  # $Name.Add( 'ArtemP-HCI-02'   )
   # $Name.Add( 'ArtemP-HCI-03'   )
   # $Name.Add( 'ArtemP-HCI-05'   )
   # $Name.Add( 'ArtemP-HCI-06'   )
@@ -80,6 +82,10 @@ $psSession  = [System.Collections.Generic.List[
   # $Name.Add( 'ArtemP-HCI-45'   )
   # $Name.Add( 'ArtemP-HCI-50'   )
   # $Name.Add( 'ArtemP-HCI-51'   )
+  # $Name.Add( 'ArtemP-HCI-52'   )
+  # $Name.Add( 'ArtemP-HCI-53'   )
+  # $Name.Add( 'ArtemP-HCI-54'   )
+  # $Name.Add( 'ArtemP-HCI-55'   )
   
   # $Name.Add( 'ArtemP-Vb-02'    )
   # $Name.Add( 'ArtemP-Vb-03'    )
@@ -95,6 +101,34 @@ $psSession  = [System.Collections.Generic.List[
   
   # $Name.Add( 'ArtemP27s'       )
   # $Name.Add( 'ArtemP27s'       )
+
+  # RS5 Desktop LTSC
+    $Name.Add( 'ArtemP-RS5DL-04' )
+    $Name.Add( 'ArtemP-RS5DL-05' )
+
+  # RS5 Core LTSC
+    $Name.Add( 'ArtemP-RS5CL-03' )
+    $Name.Add( 'ArtemP-RS5CL-04' )
+
+  # RS5 Core SAC
+    $Name.Add( 'ArtemP-RS5CS-01' )
+    $Name.Add( 'ArtemP-RS5CS-02' )
+
+  # RS5 Core HVS
+    $Name.Add( 'ArtemP-RS5CV-01' )
+    $Name.Add( 'ArtemP-RS5CV-02' )
+
+  # RS5 Core HCI
+    $Name.Add( 'ArtemP-RS5CI-01' )
+    $Name.Add( 'ArtemP-RS5CI-02' )
+
+  # RS5 Core Turbine
+    $Name.Add( 'ArtemP-RS5CT-01' )
+    $Name.Add( 'ArtemP-RS5CT-02' )
+
+  # Vb Core SAC
+    $Name.Add( 'ArtemP-VbCS-01'  )
+    $Name.Add( 'ArtemP-VbCS-02'  )
 
 Clear-DnsClientCache
 

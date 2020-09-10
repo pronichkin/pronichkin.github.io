@@ -313,40 +313,53 @@ $Install = Invoke-Command -Session $psSession -ScriptBlock {
                 $Downloader.Download()
             }
 
-            If
+            Switch
             (
                 $Download.HResult
             )
             {
-                $Message = "Download failed with Result Code $($Download.ResultCode), HResult $($Download.HResult)"
+                0
+                {
+                    $Install    = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
 
-                Write-Warning -Message $Message
+                        $Installer  = $Session.CreateUpdateInstaller()
+                        $Installer.Updates = $Update
+                        $Installer.Install()
+                    }
 
-                $Reboot = $False
-            }
-            Else
-            {
-                $Install    = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
+                    If
+                    (
+                        $Install.HResult
+                    )
+                    {
+                        $Message = "Installation failed with Result Code $($Install.ResultCode), HResult $($Install.HResult)"
 
-                    $Installer  = $Session.CreateUpdateInstaller()
-                    $Installer.Updates = $Update
-                    $Installer.Install()
+                        Write-Warning -Message $Message
+
+                        $Reboot = $False
+                    }
+                    Else
+                    {
+                        $Reboot = $Install.RebootRequired
+                    }                
                 }
 
-                If
-                (
-                    $Install.HResult
-                )
+                2359299
                 {
-                    $Message = "Installation failed with Result Code $($Install.ResultCode), HResult $($Install.HResult)"
+                    $Message = "Transient WU error (WU_S_UPDATE_ERROR/WU_E_NOT_APPLICABLE). Try restarting computer $($env:ComputerName)"
 
                     Write-Warning -Message $Message
 
                     $Reboot = $False
                 }
-                Else
+
+                Default
                 {
-                    $Reboot     = $Install.RebootRequired
+                    $Message = "Download failed with Result Code $($Download.ResultCode), HResult $($Download.HResult)"
+
+                    Write-Warning -Message $Message
+
+                    $Reboot = $False
                 }
             }
         }
@@ -381,7 +394,7 @@ If
     
         $Message = "* $psItem"
       # Write-Verbose -Message $Message
-        Write-Message -Channel Debug -Message $Message -Indent 1
+        Write-Message -Channel Debug -Message $Message
     }
 
  <# -Protocol 'dcom' (which is the default) fails with:
