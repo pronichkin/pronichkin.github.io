@@ -234,15 +234,13 @@ $Install = Invoke-Command -Session $psSession -ScriptBlock {
             $Session    = New-Object -ComObject 'Microsoft.Update.Session'
 
             $Searcher   = $Session.CreateUpdateSearcher()
-          # $Query      = 'IsInstalled = 0 and DeploymentAction = ''OptionalInstallation'''
-          # $Query      = 'IsInstalled = 0'
 
             $Query      = [System.String]::Empty
-            $Query     += "IsInstalled=0 and DeploymentAction='Installation' or "
-            $Query     += "IsInstalled=0 and DeploymentAction='OptionalInstallation' or "
-            $Query     += "IsPresent=1 and DeploymentAction='Uninstallation' or "
-            $Query     += "IsInstalled=1 and DeploymentAction='Installation' and RebootRequired=1 or "
-            $Query     += "IsInstalled=0 and DeploymentAction='Uninstallation' and RebootRequired=1"
+            $Query     += 'IsInstalled = 0 and DeploymentAction = ''Installation''                          or '
+            $Query     += 'IsInstalled = 0 and DeploymentAction = ''OptionalInstallation''                  or '
+            $Query     += 'IsPresent   = 1 and DeploymentAction = ''Uninstallation''                        or '
+            $Query     += 'IsInstalled = 1 and DeploymentAction = ''Installation''   and RebootRequired = 1 or '
+            $Query     += 'IsInstalled = 0 and DeploymentAction = ''Uninstallation'' and RebootRequired = 1'
         }
     }
 
