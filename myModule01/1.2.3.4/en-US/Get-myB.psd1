@@ -1,6 +1,6 @@
-ConvertFrom-StringData @'
+ConvertFrom-StringData -StringData @'
 
-# English strings
-
-bbb = b
+  # aaa = a
+    bbb = b
+  # ccc = c
 '@
