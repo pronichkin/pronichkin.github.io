@@ -1,3 +1,5 @@
+##Requires -Modules Get-myB
+
 Function
 Get-myNothing
 {
@@ -6,6 +8,7 @@ Get-myNothing
 
     process
     {
-        'this is bogus'
+        Get-myA
+        Get-myB
     }
 }
