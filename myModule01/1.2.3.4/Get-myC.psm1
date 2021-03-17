@@ -8,6 +8,6 @@ Get-myC
     {
         Get-myB
 
-        'c'
+        return 'c'
     }
 }

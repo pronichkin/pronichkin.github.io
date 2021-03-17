@@ -6,6 +6,6 @@ Get-myA
 
     process
     {
-        'a'
+        return 'a'
     }
 }
