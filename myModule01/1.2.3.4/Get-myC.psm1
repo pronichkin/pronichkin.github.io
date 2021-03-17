@@ -6,6 +6,7 @@ Get-myC
 
     process
     {
+        Get-myA        
         Get-myB
 
         return 'c'

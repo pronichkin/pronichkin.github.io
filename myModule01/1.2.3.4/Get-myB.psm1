@@ -6,8 +6,8 @@ Get-myB
 
     process
     {
-        Get-myA
+        Import-LocalizedData -BindingVariable 'String'
 
-        return 'b'
+        return $String.bbb
     }
 }
