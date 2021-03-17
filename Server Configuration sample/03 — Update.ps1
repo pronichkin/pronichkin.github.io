@@ -16,14 +16,19 @@ $Service = Invoke-Command -Session $psSession -ScriptBlock {
     $VerbosePreference     = $Using:VerbosePreference
     $DebugPreference       = $Using:DebugPreference    
 
-    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable
+    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable -Verbose:$False
 
     If
     (
         $Module
     )
     {
+      # “Import-Module” will emit verbose output even despite “-Verbose:$False”
+        $VerbosePreference     = [System.Management.Automation.ActionPreference]::SilentlyContinue
+
         Import-Module -ModuleInfo $Module -Verbose:$False
+
+        $VerbosePreference     = $Using:VerbosePreference
 
         [System.Tuple[System.Boolean]]$False
     }
@@ -197,7 +202,7 @@ $Install = Invoke-Command -Session $psSession -ScriptBlock {
     $VerbosePreference     = $Using:VerbosePreference
     $DebugPreference       = $Using:DebugPreference    
 
-    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable
+    $Module = Get-Module -Name 'WindowsUpdateProvider' -ListAvailable -Verbose:$False
 
     If
     (
@@ -306,40 +311,53 @@ $Install = Invoke-Command -Session $psSession -ScriptBlock {
                 $Downloader.Download()
             }
 
-            If
+            Switch
             (
                 $Download.HResult
             )
             {
-                $Message = "Download failed with Result Code $($Download.ResultCode), HResult $($Download.HResult)"
+                0
+                {
+                    $Install    = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
 
-                Write-Warning -Message $Message
+                        $Installer  = $Session.CreateUpdateInstaller()
+                        $Installer.Updates = $Update
+                        $Installer.Install()
+                    }
 
-                $Reboot = $False
-            }
-            Else
-            {
-                $Install    = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
+                    If
+                    (
+                        $Install.HResult
+                    )
+                    {
+                        $Message = "Installation failed with Result Code $($Install.ResultCode), HResult $($Install.HResult)"
 
-                    $Installer  = $Session.CreateUpdateInstaller()
-                    $Installer.Updates = $Update
-                    $Installer.Install()
+                        Write-Warning -Message $Message
+
+                        $Reboot = $False
+                    }
+                    Else
+                    {
+                        $Reboot = $Install.RebootRequired
+                    }                
                 }
 
-                If
-                (
-                    $Install.HResult
-                )
+                2359299
                 {
-                    $Message = "Installation failed with Result Code $($Install.ResultCode), HResult $($Install.HResult)"
+                    $Message = "Transient WU error (WU_S_UPDATE_ERROR/WU_E_NOT_APPLICABLE). Try restarting computer $($env:ComputerName)"
 
                     Write-Warning -Message $Message
 
                     $Reboot = $False
                 }
-                Else
+
+                Default
                 {
-                    $Reboot     = $Install.RebootRequired
+                    $Message = "Download failed with Result Code $($Download.ResultCode), HResult $($Download.HResult)"
+
+                    Write-Warning -Message $Message
+
+                    $Reboot = $False
                 }
             }
         }
@@ -374,7 +392,7 @@ If
     
         $Message = "* $psItem"
       # Write-Verbose -Message $Message
-        Write-Message -Channel Debug -Message $Message -Indent 1
+        Write-Message -Channel Debug -Message $Message
     }
 
  <# -Protocol 'dcom' (which is the default) fails with:

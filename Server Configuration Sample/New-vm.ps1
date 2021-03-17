@@ -9,43 +9,85 @@
 
 #>
 
-#region Data
+#region Random
 
+  # Random
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS_FUN_PKG\19578.1000.200303-1600\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\19578.1000.amd64fre.rs_fun_pkg.200303-1600_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS_PRERELEASE\19579.1000.200303-1518\amd64fre\vhdx\vhdx_server_serverdatacentercore_en-us_vl\19579.1000.amd64fre.rs_prerelease.200303-1518_server_serverdatacentercore_en-us_vl.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS_PRERELEASE\19579.1000.200303-1518\amd64fre\vhdx\vhdx_server_serverdatacenter_en-us_vl\19579.1000.amd64fre.rs_prerelease.200303-1518_server_serverdatacenter_en-us_vl.vhdx'
-  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\vb_release\19041.1.191206-1406\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\19041.1.amd64fre.vb_release.191206-1406_server_serverdatacenteracore_en-us_vl.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\rs_onecore_base2_has2\20209.1000.200903-1919\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\20209.1000.amd64fre.rs_onecore_base2_has2.200903-1919_server_serverazurestackhcicor_en-us.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\rs_onecore_base2_has2\20210.1000.200904-1919\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\20210.1000.amd64fre.rs_onecore_base2_has2.200904-1919_server_serverazurestackhcicor_en-us.vhdx'
+
+#endregion Random
+
+#region Release
+
+  # RS5 Desktop LTSC
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE\17763.1.180914-1434\amd64fre\vhdx\vhdx_server_serverdatacenter_en-us_vl\17763.1.amd64fre.rs5_release.180914-1434_server_serverdatacenter_en-us_vl.vhdx'
+  # $Name       = 'ArtemP-RS5DL'
+
+  # RS5 Core LTSC
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE\17763.1.180914-1434\amd64fre\vhdx\vhdx_server_serverdatacentercore_en-us_vl\17763.1.amd64fre.rs5_release.180914-1434_server_serverdatacentercore_en-us_vl.vhdx'
+  # $Name       = 'ArtemP-RS5CL'
+
+  # RS5 Core SAC
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE\17763.1.180914-1434\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\17763.1.amd64fre.rs5_release.180914-1434_server_serverdatacenteracore_en-us_vl.vhdx'
+  # $Name       = 'ArtemP-RS5CS'
+
+  # RS5 Core HVS
+  # $SourcePath = 'C:\Users\artemp\Downloads\17763.1.amd64fre.rs5_release.180914-1434_Server_ServerHyperCore_en-US.vhdx'
+  # $Name       = 'ArtemP-RS5CV'
+
+  # RS5 Core HCI
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_en-us.vhdx'
+  # $Name       = 'ArtemP-RS5CI'
+
+  # RS5 Core Turbine
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_azurecore_en-us_vl\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverturbinecore_en-us_vl.vhdx'
+  # $Name       = 'ArtemP-RS5CT'
+
+  # RS5 Refresh
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\rs5_release_svc_refresh\17763.557.190612-0019\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\17763.557.amd64fre.rs5_release_svc_refresh.190612-0019_server_serverdatacenteracore_en-us_vl.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\rs5_release_svc_refresh\17763.1339.200710-1755\amd64fre\vhdx\vhdx_server_serverstandard_en-us_vl\17763.1339.amd64fre.rs5_release_svc_refresh.200710-1755_server_serverstandard_en-us_vl.vhdx'
+
+  # Vb Core SAC
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\vb_release\19041.1.191206-1406\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\19041.1.amd64fre.vb_release.191206-1406_server_serverdatacenteracore_en-us_vl.vhdx'
+  # $Name       = 'ArtemP-VbCS'
+
+#endregion Release
+
+#region HCI
+
+  # HCI
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1048.200616-1043\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1048.amd64fre.rs5_release_svc_hci.200616-1043_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1060.200708-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1060.amd64fre.rs5_release_svc_hci.200708-1900_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1060.200708-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_ru-ru\17784.1060.amd64fre.rs5_release_svc_hci.200708-1900_server_serverazurestackhcicor_ru-ru.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17784.1081.200712-1700\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1081.amd64fre.rs5_release_svc_hci_prod1.200712-1700_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17784.1082.200713-1700\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1082.amd64fre.rs5_release_svc_hci_prod1.200713-1700_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI_PROD1\17784.1082.200713-1700\amd64fre\vhdx\vhdx_server_serverdatacenter_en-us_vl\17784.1082.amd64fre.rs5_release_svc_hci_prod1.200713-1700_server_serverdatacenter_en-us_vl.vhdx'
-  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\rs5_release_svc_refresh\17763.1339.200710-1755\amd64fre\vhdx\vhdx_server_serverstandard_en-us_vl\17763.1339.amd64fre.rs5_release_svc_refresh.200710-1755_server_serverstandard_en-us_vl.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1065.200713-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1065.amd64fre.rs5_release_svc_hci.200713-1900_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1066.200714-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1066.amd64fre.rs5_release_svc_hci.200714-1900_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1066.200714-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_ru-ru\17784.1066.amd64fre.rs5_release_svc_hci.200714-1900_server_serverazurestackhcicor_ru-ru.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1066.200714-1900\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_fr-fr\17784.1066.amd64fre.rs5_release_svc_hci.200714-1900_server_serverazurestackhcicor_fr-fr.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1067.200715-1945\amd64fre\vhdx\vhdx_server_azurecore_en-us\17784.1067.amd64fre.rs5_release_svc_hci.200715-1945_server_serverturbinecore_en-us.vhdx'
-  # $SourcePath = 'C:\Users\artemp\17784.1067.amd64fre.rs5_release_svc_hci.200715-1945_Server_ServerTurbineCorCore_en-US.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_en-us.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_ru-ru\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_ru-ru.vhdx'
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_zh-cn\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_zh-cn.vhdx'
-  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\vb_release\19041.1.191206-1406\amd64fre\vhdx\vhdx_server_serverdatacenteracore_en-us_vl\19041.1.amd64fre.vb_release.191206-1406_server_serverdatacenteracore_en-us_vl.vhdx'
-  # $SourcePath = 'C:\Users\artemp\Downloads\17763.1.amd64fre.rs5_release.180914-1434_Server_ServerHyperCore_en-US.vhdx'
-  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE\17763.1.180914-1434\amd64fre\vhdx\vhdx_server_serverdatacenter_en-us_vl\17763.1.amd64fre.rs5_release.180914-1434_server_serverdatacenter_en-us_vl.vhdx'
-  # $SourcePath = 'C:\Users\artemp\Downloads\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_Server_ServerTurbineCorCore_en-US.vhdx'
-  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE\17763.1.180914-1434\amd64fre\vhdx\vhdx_server_serverdatacenter_en-us_vl\17763.1.amd64fre.rs5_release.180914-1434_server_serverdatacenter_en-us_vl.vhdx'
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE\17763.1.180914-1434\amd64fre\vhdx\vhdx_server_serverdatacentercore_en-us_vl\17763.1.amd64fre.rs5_release.180914-1434_server_serverdatacentercore_en-us_vl.vhdx'
 
+  # Turbine
+  # $SourcePath = 'C:\Users\artemp\Downloads\17784.1067.amd64fre.rs5_release_svc_hci.200715-1945_Server_ServerTurbineCorCore_en-US.vhdx'
+  # $SourcePath = 'C:\Users\artemp\Downloads\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_Server_ServerTurbineCorCore_en-US.vhdx'
+
+#endregion HCI
+ 
   # $Name             = 'ArtemP-HCI'
   # $Name             = 'ArtemP-Vb'
   # $Name             = 'ArtemP-HVS'
   # $Name             = 'ArtemP-Dsktp'
   # $Name             = 'ArtemP-Trbn'
-  # $Name             = 'ArtemP-RS5DL'
-    $Name             = 'ArtemP-RS5CL'
+  # $Name             = 'ArtemP-RS5CL'
+
+#region Data
 
   # $Start            =  23
     $Count            =   2

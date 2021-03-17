@@ -1,6 +1,7 @@
-﻿    #region Data
+﻿#region Data
 
     $Subnet = [System.Collections.Generic.List[System.Net.ipAddress]]::new()
+
     $Subnet.Add( '192.168.0.0' )
     $Subnet.Add( '192.168.0.4' )
   # $Subnet.Add( '192.168.0.8' )
@@ -15,6 +16,7 @@
 
     $netAdapter = Get-NetAdapter -cimSession $cimSession -Physical | Where-Object -FilterScript {
         $psItem.DriverDescription -eq 'Thunderbolt(TM) Networking'
+  # } | Disable-NetAdapter -PassThru -Confirm:$False | Enable-NetAdapter -PassThru
     } | Enable-NetAdapter -PassThru
 
   # Clean up to start fresh
@@ -120,7 +122,7 @@
                     $Message = "  Testing address $ipAddressCurrent"
                     Write-Verbose -Message $Message
         
-                    $AssignCurrent = New-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -PrefixLength $PrefixLength -Debug:$False | Where-Object -FilterScript {
+                    $AssignCurrent = New-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -PrefixLength $PrefixLength -Debug:$False -Verbose:$False | Where-Object -FilterScript {
         
                         $psItem.Store -eq [Microsoft.PowerShell.Cmdletization.GeneratedTypes.netIpAddress.Store]::ActiveStore
                     }
@@ -130,7 +132,7 @@
                         $AssignCurrent.AddressState -ne [Microsoft.PowerShell.Cmdletization.GeneratedTypes.netIpAddress.AddressState]::Preferred
                     )
                     {
-                        $AssignCurrent = Get-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Debug:$False
+                        $AssignCurrent = Get-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Debug:$False -Verbose:$False
 
                         $Message = '      Waiting for the address to come online'
                         Write-Debug -Message $Message
@@ -152,7 +154,7 @@
                     {
                         $Command = Invoke-Command -Session $psSessionCurrent -ScriptBlock {
             
-                            Test-NetConnection -ComputerName $using:SubnetCurrentMark -WarningAction SilentlyContinue
+                            Test-NetConnection -ComputerName $using:SubnetCurrentMark -WarningAction SilentlyContinue -Verbose:$False -Debug:$False
                         }
 
                         $Test = $Command.PingSucceeded
@@ -170,7 +172,7 @@
                         Write-Verbose -Message 'Fail, trying next subnet'
 
                         [System.Void](
-                            Remove-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Confirm:$False -Debug:$False
+                            Remove-netIpAddress -cimSession $cimSessionCurrent -ifAlias $netAdapterCurrent.Name -ipAddress $ipAddressCurrent.ipAddressToString -Confirm:$False -Debug:$False -Verbose:$False
                         )
                     }
                 }
@@ -239,9 +241,33 @@
 
         $AssignName = $AssignPeer | ForEach-Object -Process { $psItem.psComputerName.Split( '.' )[0] } | Sort-Object
     
-        $Name = $AssignName -join ' — '
+        $NameBase = $AssignName -join ' — '
 
-        $netAdapter.Add( ( Rename-NetAdapter -InputObject $netAdapterCurrent -NewName $Name -PassThru -Debug:$False -cimSession $cimSessionCurrent ) )
+        $Count = 0
+
+        $Name = $NameBase
+
+        If
+        (
+            $netAdapterCurrent.Name -eq $Name
+        )
+        {
+            $netAdapter.Add( $netAdapterCurrent )
+        }
+        Else
+        {
+            While
+            (
+                Get-NetAdapter -CimSession $cimSessionCurrent | Where-Object -FilterScript { $psItem.Name -eq $Name }
+            )
+            {
+                $Count++
+
+                $Name = $NameBase + ' — ' + $Count
+            }
+
+            $netAdapter.Add( ( Rename-NetAdapter -InputObject $netAdapterCurrent -NewName $Name -PassThru -Debug:$False -cimSession $cimSessionCurrent -Verbose:$False ) )
+        }
 
         If
         (
@@ -249,6 +275,10 @@
         )
         {
             $ClusterNetworkCurrent = $ClusterNetwork | Where-Object -FilterScript { $Subnet.ipAddressToString -in $psItem.Ipv4Addresses }
+
+            $Count = 0
+
+            $Name = $NameBase
 
             If
             (
@@ -259,9 +289,35 @@
             }
             Else
             {
+                While
+                (
+                    Get-ClusterNetwork -InputObject $Cluster | Where-Object -FilterScript { $psItem.Name -eq $Name }
+                )
+                {
+                    $Count++
+
+                    $Name = $NameBase + ' — ' + $Count
+                }
+                
                 $ClusterNetworkCurrent.Name  =  $Name
             }
         }
+    }
+
+    $ClusterNetwork = Get-ClusterNetwork -InputObject $Cluster | Where-Object -FilterScript {
+        $psItem.Role -eq [Microsoft.FailoverClusters.PowerShell.ClusterNetworkRole]::ClusterAndClient
+    }
+
+    If
+    (
+        $ClusterNetwork.Name -eq $Cluster.Domain
+    )
+    {
+      # Skip rename
+    }
+    Else
+    {
+        $ClusterNetwork.Name = $Cluster.Domain
     }
 
 #endregion NIC name
