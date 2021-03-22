@@ -4,12 +4,16 @@ Get-myE
     [CmdletBinding()]
     param()
 
-    process
+    Begin
     {
+        Write-Debug -Message "myInvocation myCommand Name:          $($MyInvocation.MyCommand.Name)"
+        Write-Debug -Message "myInvocation myCommand Module:        $($myInvocation.myCommand.Module.Name)"
+        Write-Debug -Message "ExecutionContext SessionState Module: $($ExecutionContext.SessionState.Module.Name)"
+
       # This tricks loads the internal functions from the current module
 
-        & $myInvocation.myCommand.Module { Get-myA }
-        & $myInvocation.myCommand.Module { Get-myB }
+        & ( Get-Module | Where-Object -FilterScript { $ExecutionContext.SessionState.Module -in $psItem.NestedModules } ) { Get-myA }
+        & ( Get-Module | Where-Object -FilterScript { $ExecutionContext.SessionState.Module -in $psItem.NestedModules } ) { Get-myB }
 
         return 'e'
     }

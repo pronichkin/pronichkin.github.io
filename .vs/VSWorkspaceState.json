@@ -1,17 +1,13 @@
 {
   "ExpandedNodes": [
     "",
-    "\\DatacenterAdvancedAutomation.Process",
-    "\\DatacenterAdvancedAutomation.Process\\1.0.2020.105",
-    "\\DatacenterAdvancedAutomation.Utility",
-    "\\DismEx",
-    "\\DismEx\\1.0.2019.1227",
+    "\\Hyper-Vex",
+    "\\Hyper-Vex\\1.0.2019.921",
     "\\myModule01",
     "\\myModule01\\1.2.3.4",
     "\\myModule01\\1.2.3.4\\en-US",
-    "\\OEM branding sample",
     "\\Server Configuration Sample"
   ],
-  "SelectedNode": "\\myModule01\\1.2.3.4\\Get-myE.psm1",
+  "SelectedNode": "\\Hyper-Vex\\1.0.2019.921\\ConvertFrom-CimProperty.psm1",
   "PreviewInSolutionExplorer": false
 }
