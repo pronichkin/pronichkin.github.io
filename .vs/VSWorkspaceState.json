@@ -1,13 +1,7 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Hyper-Vex",
-    "\\Hyper-Vex\\1.0.2019.921",
-    "\\myModule01",
-    "\\myModule01\\1.2.3.4",
-    "\\myModule01\\1.2.3.4\\en-US",
-    "\\Server Configuration Sample"
+    "\\DatacenterAdvancedAutomation.Utility"
   ],
-  "SelectedNode": "\\Hyper-Vex\\1.0.2019.921\\ConvertFrom-CimProperty.psm1",
   "PreviewInSolutionExplorer": false
 }

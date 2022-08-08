@@ -10,7 +10,9 @@
 
   # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1048.200616-1043\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1048.amd64fre.rs5_release_svc_hci.200616-1043_server_serverazurestackhcicor_en-us.vhdx'
 
-    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_en-us.vhdx'
+  # $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\RS5_RELEASE_SVC_HCI\17784.1068.200716-1400\amd64fre\vhdx\vhdx_server_serverazurestackhcicor_en-us\17784.1068.amd64fre.rs5_release_svc_hci.200716-1400_server_serverazurestackhcicor_en-us.vhdx'
+
+    $SourcePath = '\\winbuilds.ntdev.corp.microsoft.com\release\fe_release\20348.1.210507-1500\amd64fre\vhdx\vhdx_server_serverAzureStackHCICor_en-us\20348.1.amd64fre.fe_release.210507-1500_server_serverAzureStackHCICor_en-us.vhdx'
 
     $DomainName       = 'ntDev.corp.Microsoft.com'
     $Password         = 'P@ssw0rd.123'
@@ -276,8 +278,28 @@ $psSession | ForEach-Object -Process {
     
         $Disk = Get-Disk -cimSession $cimSessionCurrent -Number $DiskImage.Number
 
+        if
+        (
+            $Disk.IsOffline
+        )
+        {
+            $Disk = Set-Disk -InputObject $Disk -IsOffline $False
+        }
+
         $Partition = Get-Partition -Disk $Disk | Where-Object -FilterScript {
             $psItem.Type -eq 'Basic'
+        }
+
+        If
+        (
+            $Partition.AccessPaths
+        )
+        {
+            Write-Message -Channel Verbose -Message $Partition.AccessPaths[0]
+        }
+        Else
+        {
+            $Partition = Add-PartitionAccessPath -InputObject $Partition -AssignDriveLetter -PassThru
         }
 
       # Load registry hive and set VHDX to not expand on boot

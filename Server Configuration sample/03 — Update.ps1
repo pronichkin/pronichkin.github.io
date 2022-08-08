@@ -232,6 +232,8 @@ $Install = Invoke-Command -Session $psSession -ScriptBlock {
         PowerShell session which is using a virtual account and hence does not
         count as remote  #>
 
+
+
         $psSessionCurrent = New-PSSession -ConfigurationName 'VirtualUpdate' -EnableNetworkAccess
 
         Invoke-Command -Session $psSessionCurrent -ScriptBlock {

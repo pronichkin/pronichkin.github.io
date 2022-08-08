@@ -108,7 +108,7 @@ $psSession  = [System.Collections.Generic.List[
   # $Name.Add( 'ArtemP27s'       )
 
   # RS5 Desktop LTSC
-    $Name.Add( 'ArtemP-RS5DL-04' )
+ <#$ $Name.Add( 'ArtemP-RS5DL-04' )
     $Name.Add( 'ArtemP-RS5DL-05' )
 
   # RS5 Core LTSC
@@ -133,7 +133,7 @@ $psSession  = [System.Collections.Generic.List[
 
   # Vb Core SAC
     $Name.Add( 'ArtemP-VbCS-01'  )
-    $Name.Add( 'ArtemP-VbCS-02'  )
+    $Name.Add( 'ArtemP-VbCS-02'  )  #>
 
 Clear-DnsClientCache
 
