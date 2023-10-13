@@ -1,0 +1,42 @@
+# https://learn.microsoft.com/windows/win32/secauthz/privilege-constants
+
+Enum
+Privilege
+{
+    SeAssignPrimaryTokenPrivilege
+    SeAuditPrivilege
+    SeBackupPrivilege
+    SeChangeNotifyPrivilege
+    SeCreateGlobalPrivilege
+    SeCreatePagefilePrivilege
+    SeCreatePermanentPrivilege
+    SeCreateSymbolicLinkPrivilege
+    SeCreateTokenPrivilege
+    SeDebugPrivilege
+    SeEnableDelegationPrivilege
+    SeImpersonatePrivilege
+    SeIncreaseBasePriorityPrivilege
+    SeIncreaseQuotaPrivilege
+    SeIncreaseWorkingSetPrivilege
+    SeLoadDriverPrivilege
+    SeLockMemoryPrivilege
+    SeMachineAccountPrivilege
+    SeManageVolumePrivilege
+    SeProfileSingleProcessPrivilege
+    SeRelabelPrivilege
+    SeRemoteShutdownPrivilege
+    SeRestorePrivilege
+    SeSecurityPrivilege
+    SeShutdownPrivilege
+    SeSyncAgentPrivilege
+    SeSystemEnvironmentPrivilege
+    SeSystemProfilePrivilege
+    SeSystemtimePrivilege
+    SeTakeOwnershipPrivilege
+    SeTcbPrivilege
+    SeTimeZonePrivilege
+    SeTrustedCredManAccessPrivilege
+    SeUndockPrivilege
+    SeUnsolicitedInputPrivilege
+  # BogusPrivilege
+}

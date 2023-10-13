@@ -1,7 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\DatacenterAdvancedAutomation.Utility"
+    "\\DatacenterAdvancedAutomation.Process",
+    "\\DatacenterAdvancedAutomation.Process\\1.0.2023.1012",
+    "\\DatacenterAdvancedAutomation.Utility",
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2019.1227\\TokenPrivilege",
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2022.805\\TokenPrivilege",
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2023.1010",
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2023.1010\\Registry",
+    "\\Garbage\\Cat class",
+    "\\Garbage\\Process"
   ],
+  "SelectedNode": "\\DatacenterAdvancedAutomation.Process\\1.0.2023.1012\\WinBase.cs",
   "PreviewInSolutionExplorer": false
 }
