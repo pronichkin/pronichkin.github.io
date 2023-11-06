@@ -1,6 +1,6 @@
 ﻿<#
     Attempt 16. Fixed buffer
-    Note: this will note crash but it's unclear how to interpret the results
+    Note: this will not crash but it's unclear how to interpret the results
 #>
 
 $typeDefinition = @'
