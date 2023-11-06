@@ -97,8 +97,15 @@ $getVirtualDiskInformationParam = @(
 )
 $result = [VirtDisk16]::GetVirtualDiskInformation.Invoke( $getVirtualDiskInformationParam )
 
-# this only returns the first characters and a bunch of whitespace after it
+ <# This is a quick and dirty way to extract first 8 characters from the array.
+    But in our case it only returns the first character correctly and a bunch of
+    whitespace after it  #>
+
 [VirtDisk16]::AccessEmbeddedArray( $VirtualDiskInfo.ParentLocation )
 
-# this also returns only the first characater and a bunch of bytes after it
-0..16 | ForEach-Object -Process { [System.Runtime.InteropServices.Marshal]::ReadByte( $VirtualDiskInfo.ParentLocation.ParentLocationBuffer, $psItem ) }
+ <# This is supposedly the same but with marshaling. It also returns only the code
+    of the first characater and a bunch of nulls after it  #>
+
+0..16 | ForEach-Object -Process {
+    [System.Runtime.InteropServices.Marshal]::ReadByte( $VirtualDiskInfo.ParentLocation.ParentLocationBuffer, $psItem )
+}
