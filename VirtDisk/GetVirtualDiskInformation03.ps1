@@ -65,12 +65,12 @@ $type = Add-Type -PassThru -TypeDefinition $typeDefinition
 $VirtualDiskInfo = [VirtualDiskInfo03]::new()
 $VirtualDiskInfo.Version = 3  # ParentLocation
 
-[System.UInt32]$VirtualDiskInfoSize = [System.Runtime.InteropServices.Marshal]::SizeOf( $VirtualDiskInfo )
+[System.UInt32] $VirtualDiskInfoSize = [System.Runtime.InteropServices.Marshal]::SizeOf( $VirtualDiskInfo )
 
  <# currently the struct is only 16 bytes long, and the function will return
-   "The parameter is incorrect" if it's lower than 32  #>
-[System.UInt32]$VirtualDiskInfoSize = 32
-[System.UInt32]$SizeUsed = $null
+   “The parameter is incorrect” if it's lower than 32  #>
+[System.UInt32] $VirtualDiskInfoSize = 32
+[System.UInt32] $SizeUsed = $null
 
 $getVirtualDiskInformationParam = @(
             $handle # VirtualDiskHandle
@@ -85,10 +85,10 @@ $result = [VirtDisk03]::GetVirtualDiskInformation.Invoke( $getVirtualDiskInforma
     needed. So now we can allocate exactly the right amount of memory.
  #>
 
-[System.IntPtr]$VirtualDiskInfoRaw = [System.Runtime.InteropServices.Marshal]::AllocHGlobal( $VirtualDiskInfoSize )
+[System.IntPtr] $VirtualDiskInfoRaw = [System.Runtime.InteropServices.Marshal]::AllocHGlobal( $VirtualDiskInfoSize )
 [System.Runtime.InteropServices.Marshal]::StructureToPtr( $VirtualDiskInfo, $VirtualDiskInfoRaw, $true )
 
-# but now we can redefine our function so that it consumes a pointer instead of ref
+# But now we can redefine our function so that it consumes a pointer instead of ref
 
 $typeDefinition = @'
     
@@ -161,13 +161,14 @@ $ParentLocationString = [System.Text.UnicodeEncoding]::Unicode.GetString( $Paren
 
  <# Note that unlike the previous examples, there's no longer the need to trim
     extra whitespace since we allocated (and marshalled) the exact amount of
-    memory instead of guessing and overprovisioning.
-  #>
+    memory instead of guessing and overprovisioning.  #>
+
 $ParentLocation       = $ParentLocationString.Split( "`0" )
 
 return $ParentLocation
 
-# Just in case. Those are sometimes zeros and sometimes gibberish.
+ <# Just in case. Those are sometimes zeros and sometimes gibberish in those
+    24 bytes at the end.  #>
 
 $ParentLocationExtra = $ParentLocationBufferSize..($ParentLocationBufferSize+23) | ForEach-Object -Process {
     [System.Runtime.InteropServices.Marshal]::ReadByte( $ParentLocationBufferRaw, $psItem )
