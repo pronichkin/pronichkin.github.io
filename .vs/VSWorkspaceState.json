@@ -5,9 +5,11 @@
     "\\DatacenterAdvancedAutomation.Process\\1.0.2023.1012",
     "\\DatacenterAdvancedAutomation.Registry",
     "\\DatacenterAdvancedAutomation.Registry\\1.0.2023.1014",
+    "\\DatacenterAdvancedAutomation.Storage",
+    "\\DatacenterAdvancedAutomation.Storage\\1.0.2023.1016",
     "\\DatacenterAdvancedAutomation.Utility",
-    "\\DatacenterAdvancedAutomation.Utility\\1.0.2023.1010"
+    "\\DatacenterAdvancedAutomation.Utility\\1.0.2023.1010",
+    "\\Test"
   ],
-  "SelectedNode": "\\DatacenterAdvancedAutomation.Process\\1.0.2023.1012\\Set-TokenPrivilege.psm1",
   "PreviewInSolutionExplorer": false
 }

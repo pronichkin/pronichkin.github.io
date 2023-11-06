@@ -83,6 +83,13 @@ Add-TypeEx
         [System.IO.FileInfo[]]
      <# Dependency assembly file(s) (.dll)  #>
         $ReferencedAssembly
+    ,
+        [System.Management.Automation.ParameterAttribute(
+            Mandatory         = $False
+        )]        
+        [System.Management.Automation.SwitchParameter]
+     <# Dependency assembly file(s) (.dll)  #>
+        $InstallCompiler
     )
 
     begin    
@@ -98,6 +105,29 @@ Add-TypeEx
 
         Write-Debug -Message "Stack[1] Module Mame:                 $($(Get-psCallStack)[1].InvocationInfo.MyCommand.Module.Name)"
         Write-Debug -Message "Stack[1] Module Base:                 $($(Get-psCallStack)[1].InvocationInfo.MyCommand.Module.ModuleBase)"  #>
+
+        if
+        (
+            $InstallCompiler
+        )
+        {
+            $resource = Import-psResource -InputObject 'Microsoft.CodeDom.Providers.DotNetCompilerPlatform' -Type None
+          # $type = Add-Type -Path $resource.Location -PassThru
+
+            $libPath      = Split-Path -Path $resource.Location
+            $compilerPath = Join-Path  -Path $libPath -ChildPath '..\..' -Resolve
+            $compiler     = Get-ChildItem -Path $compilerPath  -Recurse -Filter 'csc.exe'
+
+            $providerOptionParam = @(
+                $compiler.FullName  # Compiler FullPath
+                10                  # Compiler Server Time To Live
+            )
+            $providerOption = [Microsoft.CodeDom.Providers.DotNetCompilerPlatform.ProviderOptions]::new.Invoke( $providerOptionParam )
+
+            $provider = [Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider]::new( $providerOption )
+
+          # $type = Add-Type -TypeDefinition $code -PassThru -CodeDomProvider $provider
+        }            
     }
 
     process{
@@ -108,8 +138,7 @@ Add-TypeEx
         }
         $SourcePath = Join-Path @PathParam
 
-        $TypeParam = @{
-            Path                 = $SourcePath
+        $TypeParam = @{            
             Debug                = $false
             PassThru             = $true
         }
@@ -154,6 +183,21 @@ Add-TypeEx
 
         if
         (
+            $InstallCompiler
+        )
+        {
+            $code = Get-Content -Path $SourcePath -Raw
+
+            $TypeParam.Add( 'CodeDomProvider', $provider )
+            $TypeParam.Add( 'TypeDefinition',  $code     )
+        }
+        else
+        {
+            $TypeParam.Add( 'Path', $SourcePath )
+        }
+
+        if
+        (
             $ReferencedAssembly
         )
         {
@@ -192,7 +236,7 @@ Add-TypeEx
 
         Write-Message -Channel Debug -Message $Message
 
-        Write-Message -Channel Debug -Message $type.FullName
+        Write-Message -Channel Debug -Message $type[0].FullName
 
         return $type
     }

@@ -84,7 +84,17 @@ Set-TokenPrivilege
         But you cannot refer to an assembly if it only exists in memory. Hence,
         we need to load the DLL file from the disk  #>
 
-        $SecurityBaseApi = Add-TypeEx -InputObject 'SecurityBaseApi' -ReferencedAssembly $TokenPrivilege.Assembly.Location
+        if
+        (
+            $TokenPrivilege.Assembly.Location
+        )
+        {
+            $SecurityBaseApi = Add-TypeEx -InputObject 'SecurityBaseApi' -ReferencedAssembly $TokenPrivilege.Assembly.Location
+        }
+        else
+        {
+            throw '“Token Privilege” type was manually generated previously without outputting assembly. You''ll need to restart PowerShell'
+        }
     }
 
     Process

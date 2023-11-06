@@ -77,6 +77,25 @@ Write-Message
             }
         }
 
+        switch
+        (
+            $psVersionTable.psEdition
+        )
+        {
+            'Core'
+            {
+              # PowerShell 7 won't find `[Microsoft.PowerShell.Commands.DisplayHintType]`
+              # without importing the assmebly first
+                $path = Join-Path -Path $psHome -ChildPath 'Microsoft.PowerShell.Commands.Utility.dll'
+                $assembly = [System.Reflection.Assembly]::LoadFrom( $path )
+            }
+
+            'Desktop'
+            {
+              # no workarounds are required
+            }
+        }
+
         $DisplayHint = [Microsoft.PowerShell.Commands.DisplayHintType]::Time
         $TimeStamp   = ( Get-Date -DisplayHint $DisplayHint ).DateTime
 

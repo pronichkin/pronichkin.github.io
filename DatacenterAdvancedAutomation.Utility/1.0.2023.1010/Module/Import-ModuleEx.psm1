@@ -22,7 +22,7 @@ Import-ModuleEx
             $Name
         ,
             [parameter(
-                ParameterSetName = "ModuleInfo",
+                ParameterSetName = 'ModuleInfo',
                 Mandatory        =  $True
             )]
             [System.Management.Automation.PSModuleInfo]
