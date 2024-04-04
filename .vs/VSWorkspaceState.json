@@ -1,6 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\VirtDisk"
   ],
+  "SelectedNode": "\\VirtDisk\\GetVirtualDiskInformation16.ps1",
   "PreviewInSolutionExplorer": false
 }
