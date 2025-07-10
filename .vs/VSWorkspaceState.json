@@ -1,6 +1,7 @@
 {
   "ExpandedNodes": [
     "",
+    "\\Server Configuration Sample",
     "\\VirtDisk"
   ],
   "SelectedNode": "\\VirtDisk\\GetVirtualDiskInformation16.ps1",
