@@ -1,6 +1,7 @@
 bin
 obj
 .vs
+VSWorkspaceState.json
 
 *.suo
 *.sdf
@@ -9,3 +10,4 @@ obj
 *.tmp
 *.cache
 *.binlog
+/.vs/VSWorkspaceState.json
