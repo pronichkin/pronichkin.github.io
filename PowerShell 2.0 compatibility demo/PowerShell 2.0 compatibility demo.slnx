@@ -1,3 +1,9 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="initialize.ps1" />
+    <File Path="My Legacy Script 01.ps1" />
+    <File Path="My Legacy Script 02.ps1" />
+    <File Path="My Legacy Script 03.ps1" />
+  </Folder>
   <Project Path="PowerShell 2.0 compatibility demo/PowerShell 2.0 compatibility demo.csproj" Id="ba2d7631-e122-4762-8ccf-ab151eae984e" />
 </Solution>
