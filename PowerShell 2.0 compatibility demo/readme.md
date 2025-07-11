@@ -8,6 +8,7 @@ Guidance
 1. Run `My Legacy Script 01.ps1`..`My Legacy Script 03.ps1` in different versions of PowerShell to observe the differences in behavior.
 
 Additional considerations
+
 Here's one option to launch multiple different versions of PowerShell. This will open multiple console windows (or tabs in Windows Terminal.)
 ```PowerShell
 Start-Process -FilePath "$env:systemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList @( '-noExit' )
